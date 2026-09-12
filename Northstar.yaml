@@ -1,0 +1,65 @@
+name: Northstar
+
+classes:
+  - name: Warlock
+    level: 6
+    subclass: Celestial
+
+abilities:
+  base:
+    strength: 8
+    dexterity: 17
+    constitution: 16
+    intelligence: 12
+    wisdom: 14
+    charisma: 18
+
+proficiencies:
+  saving_throws:
+    - wisdom
+    - charisma
+
+  skills:
+    proficient:
+      - religion
+      - insight
+    expertise: []
+
+inventory:
+  dagger: 2
+  amulet_of_health: 1
+  scale_mail: 1
+  shield: 1
+
+equipment:
+  armor: scale_mail
+  shield: shield
+  worn:
+    - amulet_of_health
+
+features:
+  - agonizing_blast
+  - repelling_blast
+  - eldritch_mind
+  - devils_sight
+
+spells:
+  learned:
+    - hex
+    - bless
+    - cure_wounds
+
+state:
+  hp:
+    current: 37
+    temporary: 0
+
+  death_saves:
+    successes: 0
+    failures: 0
+
+  conditions: []
+
+  concentration: null
+
+  inspiration: false
