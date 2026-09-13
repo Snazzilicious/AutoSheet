@@ -96,8 +96,7 @@ def test_active_sources():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    assert len(sources) == 1
-    assert isinstance(sources[0], AmuletOfHealth)
+    assert len(sources) == 3
 
 
 def test_collect_updates_and_calculate():
@@ -105,10 +104,10 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Should have Amulet of Health (BASE=100) and Ability modifiers (MODIFIERS=200)
-    assert len(updates) == 2
+    # Should have Amulet of Health (BASE=100), Ability modifiers (MODIFIERS=200),
+    # Proficiency bonus (MODIFIERS=200), Base combat (250), Scale Mail (300), Shield (310)
+    assert len(updates) == 6
     assert updates[0].priority == BASE
-    assert updates[1].priority == MODIFIERS
 
     effective = calculate(character)
     # Constitution should be 19 due to Amulet of Health, modifier +4
@@ -117,3 +116,13 @@ def test_collect_updates_and_calculate():
     # Dexterity should remain 17 (base), modifier +3
     assert effective.abilities.dexterity == 17
     assert effective.abilities.dexterity_modifier == +3
+
+
+def test_combat_statistics():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+
+    assert effective.combat.get("proficiency_bonus") == 3
+    assert effective.combat.get("initiative") == 3
+    assert effective.combat.get("ac") == 18

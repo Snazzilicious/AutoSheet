@@ -181,6 +181,47 @@ class AmuletOfHealth:
         )
 
 
+class ScaleMail:
+    """
+    Scale Mail: Medium armor, AC 14 + Dex modifier (max +2).
+    """
+
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=DERIVED,
+                source="Scale Mail",
+                function=self.update_ac,
+            )
+        ]
+
+    @staticmethod
+    def update_ac(ctx: CalculationContext) -> None:
+        dex_mod = ctx.effective.abilities.dexterity_modifier
+        armor_ac = 14 + min(dex_mod, 2)
+        current_ac = ctx.effective.combat.get("ac", 10 + dex_mod)
+        ctx.effective.combat["ac"] = max(current_ac, armor_ac)
+
+
+class Shield:
+    """
+    Shield: +2 AC.
+    """
+
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=DERIVED + 10,
+                source="Shield",
+                function=self.update_shield,
+            )
+        ]
+
+    @staticmethod
+    def update_shield(ctx: CalculationContext) -> None:
+        ctx.effective.combat["ac"] = ctx.effective.combat.get("ac", 10) + 2
+
+
 def ability_modifier(score: int) -> int:
     """
     D&D ability modifier calculation.
@@ -202,13 +243,41 @@ def update_ability_modifiers(ctx: CalculationContext) -> None:
     abilities.charisma_modifier = ability_modifier(abilities.charisma)
 
 
+def update_proficiency_bonus(ctx: CalculationContext) -> None:
+    """
+    Calculate proficiency bonus based on total character level.
+    """
+    total_level = sum(c.get("level", 0) for c in ctx.saved.classes)
+    pb = (total_level - 1) // 4 + 2 if total_level > 0 else 2
+    ctx.effective.combat["proficiency_bonus"] = pb
+
+
+def update_base_combat(ctx: CalculationContext) -> None:
+    """
+    Calculate base unarmored AC and initiative.
+    """
+    dex_mod = ctx.effective.abilities.dexterity_modifier
+    ctx.effective.combat["ac"] = 10 + dex_mod
+    ctx.effective.combat["initiative"] = dex_mod
+
+
 def standard_updates(character: SavedCharacter) -> list[Update]:
     return [
         Update(
             priority=MODIFIERS,
             source="Ability modifiers",
             function=update_ability_modifiers,
-        )
+        ),
+        Update(
+            priority=MODIFIERS,
+            source="Proficiency bonus",
+            function=update_proficiency_bonus,
+        ),
+        Update(
+            priority=250,
+            source="Base combat",
+            function=update_base_combat,
+        ),
     ]
 
 
@@ -241,6 +310,8 @@ def calculate(character: SavedCharacter) -> EffectiveCharacter:
 
 ITEMS = {
     "amulet_of_health": AmuletOfHealth,
+    "scale_mail": ScaleMail,
+    "shield": Shield,
 }
 
 FEATURES: dict[str, Any] = {}
