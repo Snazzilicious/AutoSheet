@@ -13,13 +13,15 @@
    - Proficiency bonus calculation based on total character level (`(total_level - 1) // 4 + 2`).
    - Armor Class (AC) calculation incorporating base unarmored AC, medium armor (Scale Mail with Dex cap), and shields.
    - Initiative calculation based on Dexterity modifier.
-6. **Test Suite**:
-   - 8 passing unit tests covering loading, effective stats, rules, active sources, and combat statistics.
+6. **Saving Throws & Skills**:
+   - Saving throw bonus calculation incorporating ability modifiers and proficiency bonus for proficient saves.
+   - Skill bonus calculation mapping skills to base abilities and applying proficiency or expertise multipliers.
+7. **Test Suite**:
+   - 9 passing unit tests covering loading, effective stats, rules, active sources, combat statistics, saving throws, and skills.
 
 ## Not Yet Implemented / Planned
-1. **Saving Throws & Skills**: Proficiency bonus application to saving throws and skills (including expertise).
-2. **HP & Hit Dice**: Maximum HP calculation, hit dice tracking, and expenditure.
-3. **Resources & Spell Slots**: Tracking and recharging resources/spell slots on short/long rests.
-4. **Spells & Features**: Full integration of `FEATURES`, `CLASSES`, `SUBCLASSES`, `SPELLS`, and `SPECIES` registries with spellcasting mechanics and active effects/concentration.
-5. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
-6. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.
+1. **HP & Hit Dice**: Maximum HP calculation, hit dice tracking, and expenditure.
+2. **Resources & Spell Slots**: Tracking and recharging resources/spell slots on short/long rests.
+3. **Spells & Features**: Full integration of `FEATURES`, `CLASSES`, `SUBCLASSES`, `SPELLS`, and `SPECIES` registries with spellcasting mechanics and active effects/concentration.
+4. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
+5. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.

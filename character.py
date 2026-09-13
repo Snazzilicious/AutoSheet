@@ -261,6 +261,85 @@ def update_base_combat(ctx: CalculationContext) -> None:
     ctx.effective.combat["initiative"] = dex_mod
 
 
+SKILL_ABILITIES = {
+    "athletics": "strength",
+    "acrobatics": "dexterity",
+    "sleight_of_hand": "dexterity",
+    "stealth": "dexterity",
+    "arcana": "intelligence",
+    "history": "intelligence",
+    "investigation": "intelligence",
+    "nature": "intelligence",
+    "religion": "intelligence",
+    "animal_handling": "wisdom",
+    "insight": "wisdom",
+    "medicine": "wisdom",
+    "perception": "wisdom",
+    "survival": "wisdom",
+    "deception": "charisma",
+    "intimidation": "charisma",
+    "performance": "charisma",
+    "persuasion": "charisma",
+}
+
+
+def update_saving_throws(ctx: CalculationContext) -> None:
+    """
+    Calculate saving throw bonuses.
+    """
+    abilities = ctx.effective.abilities
+    pb = ctx.effective.combat.get("proficiency_bonus", 2)
+    prof_saves = set(ctx.saved.proficiencies.get("saving_throws", []))
+
+    ability_map = {
+        "strength": abilities.strength_modifier,
+        "dexterity": abilities.dexterity_modifier,
+        "constitution": abilities.constitution_modifier,
+        "intelligence": abilities.intelligence_modifier,
+        "wisdom": abilities.wisdom_modifier,
+        "charisma": abilities.charisma_modifier,
+    }
+
+    saves = {}
+    for ability, mod in ability_map.items():
+        bonus = mod + (pb if ability in prof_saves else 0)
+        saves[ability] = bonus
+
+    ctx.effective.combat["saving_throws"] = saves
+
+
+def update_skills(ctx: CalculationContext) -> None:
+    """
+    Calculate skill bonuses.
+    """
+    abilities = ctx.effective.abilities
+    pb = ctx.effective.combat.get("proficiency_bonus", 2)
+    skills_data = ctx.saved.proficiencies.get("skills", {})
+    prof_skills = set(skills_data.get("proficient", []))
+    exp_skills = set(skills_data.get("expertise", []))
+
+    ability_map = {
+        "strength": abilities.strength_modifier,
+        "dexterity": abilities.dexterity_modifier,
+        "constitution": abilities.constitution_modifier,
+        "intelligence": abilities.intelligence_modifier,
+        "wisdom": abilities.wisdom_modifier,
+        "charisma": abilities.charisma_modifier,
+    }
+
+    skill_bonuses = {}
+    for skill, ability_name in SKILL_ABILITIES.items():
+        mod = ability_map.get(ability_name, 0)
+        mult = 0
+        if skill in exp_skills:
+            mult = 2
+        elif skill in prof_skills:
+            mult = 1
+        skill_bonuses[skill] = mod + (mult * pb)
+
+    ctx.effective.combat["skill_bonuses"] = skill_bonuses
+
+
 def standard_updates(character: SavedCharacter) -> list[Update]:
     return [
         Update(
@@ -277,6 +356,16 @@ def standard_updates(character: SavedCharacter) -> list[Update]:
             priority=250,
             source="Base combat",
             function=update_base_combat,
+        ),
+        Update(
+            priority=DERIVED,
+            source="Saving throws",
+            function=update_saving_throws,
+        ),
+        Update(
+            priority=DERIVED,
+            source="Skills",
+            function=update_skills,
         ),
     ]
 

@@ -105,8 +105,9 @@ def test_collect_updates_and_calculate():
 
     updates = collect_updates(character)
     # Should have Amulet of Health (BASE=100), Ability modifiers (MODIFIERS=200),
-    # Proficiency bonus (MODIFIERS=200), Base combat (250), Scale Mail (300), Shield (310)
-    assert len(updates) == 6
+    # Proficiency bonus (MODIFIERS=200), Base combat (250), Saving throws (DERIVED=300),
+    # Skills (DERIVED=300), Scale Mail (DERIVED=300), Shield (DERIVED=310)
+    assert len(updates) == 8
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -126,3 +127,19 @@ def test_combat_statistics():
     assert effective.combat.get("proficiency_bonus") == 3
     assert effective.combat.get("initiative") == 3
     assert effective.combat.get("ac") == 18
+
+
+def test_saving_throws_and_skills():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+
+    saves = effective.combat.get("saving_throws", {})
+    assert saves.get("wisdom") == 5     # +2 mod + 3 pb
+    assert saves.get("charisma") == 7   # +4 mod + 3 pb
+    assert saves.get("strength") == -1  # -1 mod
+
+    skills = effective.combat.get("skill_bonuses", {})
+    assert skills.get("religion") == 4  # Intelligence +1 + 3 pb
+    assert skills.get("insight") == 5   # Wisdom +2 + 3 pb
+    assert skills.get("acrobatics") == 3 # Dexterity +3 (not proficient)
