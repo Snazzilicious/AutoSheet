@@ -12,6 +12,7 @@ from character import (
     FINAL,
     ITEMS,
     AmuletOfHealth,
+    get_active_sources,
 )
 
 
@@ -72,3 +73,14 @@ def test_rule_registries_and_amulet():
     assert len(updates) == 1
     assert updates[0].priority == BASE
     assert updates[0].source == "Amulet of Health"
+
+
+def test_active_sources():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    sources = get_active_sources(character)
+    
+    # Northstar has amulet_of_health worn, plus scale_mail armor and shield shield
+    # Since scale_mail and shield are not in ITEMS yet, only amulet_of_health will be collected.
+    assert len(sources) == 1
+    assert isinstance(sources[0], AmuletOfHealth)

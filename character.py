@@ -31,6 +31,49 @@ class SavedCharacter:
     spells: dict[str, Any]
     state: dict[str, Any]
 
+    def active_sources(self) -> list[Any]:
+        """
+        Return rule objects representing things currently affecting the character.
+        """
+        sources = []
+
+        # Classes
+        for class_data in self.classes:
+            class_name = class_data.get("name")
+            if class_name in CLASSES:
+                sources.append(CLASSES[class_name](class_data))
+
+        # Features
+        for feature_id in self.features:
+            if feature_id in FEATURES:
+                sources.append(FEATURES[feature_id]())
+
+        # Equipped items (worn)
+        for item_id in self.equipment.get("worn", []):
+            item_class = ITEMS.get(item_id)
+            if item_class is not None:
+                sources.append(item_class())
+
+        # Armor
+        armor = self.equipment.get("armor")
+        if armor:
+            item_class = ITEMS.get(armor)
+            if item_class is not None:
+                sources.append(item_class())
+
+        # Shield
+        shield = self.equipment.get("shield")
+        if shield:
+            item_class = ITEMS.get(shield)
+            if item_class is not None:
+                sources.append(item_class())
+
+        return sources
+
+
+def get_active_sources(character: SavedCharacter) -> list[Any]:
+    return character.active_sources()
+
 
 @dataclass
 class Abilities:
