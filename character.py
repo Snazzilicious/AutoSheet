@@ -340,6 +340,53 @@ def update_skills(ctx: CalculationContext) -> None:
     ctx.effective.combat["skill_bonuses"] = skill_bonuses
 
 
+CLASS_HIT_DIE = {
+    "barbarian": 12,
+    "fighter": 10,
+    "paladin": 10,
+    "ranger": 10,
+    "bard": 8,
+    "cleric": 8,
+    "druid": 8,
+    "monk": 8,
+    "rogue": 8,
+    "warlock": 8,
+    "sorcerer": 6,
+    "wizard": 6,
+}
+
+
+def update_hp_and_hit_dice(ctx: CalculationContext) -> None:
+    """
+    Calculate maximum hit points and hit dice.
+    """
+    con_mod = ctx.effective.abilities.constitution_modifier
+    total_hp = 0
+    hit_dice = {}
+
+    first_level = True
+    for class_data in ctx.saved.classes:
+        class_name = class_data.get("name", "").lower()
+        level = class_data.get("level", 1)
+        die = CLASS_HIT_DIE.get(class_name, 8)
+        die_avg = (die // 2) + 1
+
+        class_hp = 0
+        for lvl in range(1, level + 1):
+            if first_level and lvl == 1:
+                class_hp += max(1, die + con_mod)
+            else:
+                class_hp += max(1, die_avg + con_mod)
+        first_level = False
+        total_hp += class_hp
+
+        die_key = f"d{die}"
+        hit_dice[die_key] = hit_dice.get(die_key, 0) + level
+
+    ctx.effective.combat["hit_point_max"] = total_hp
+    ctx.effective.combat["hit_dice"] = hit_dice
+
+
 def standard_updates(character: SavedCharacter) -> list[Update]:
     return [
         Update(
@@ -366,6 +413,11 @@ def standard_updates(character: SavedCharacter) -> list[Update]:
             priority=DERIVED,
             source="Skills",
             function=update_skills,
+        ),
+        Update(
+            priority=DERIVED,
+            source="HP and Hit Dice",
+            function=update_hp_and_hit_dice,
         ),
     ]
 

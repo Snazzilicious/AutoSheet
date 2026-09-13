@@ -16,12 +16,14 @@
 6. **Saving Throws & Skills**:
    - Saving throw bonus calculation incorporating ability modifiers and proficiency bonus for proficient saves.
    - Skill bonus calculation mapping skills to base abilities and applying proficiency or expertise multipliers.
-7. **Test Suite**:
-   - 9 passing unit tests covering loading, effective stats, rules, active sources, combat statistics, saving throws, and skills.
+7. **HP & Hit Dice**:
+   - Maximum HP calculation based on class hit dice (max at level 1, average per subsequent level) and Constitution modifier.
+   - Hit dice tracking per class/die type.
+8. **Test Suite**:
+   - 10 passing unit tests covering loading, effective stats, rules, active sources, combat statistics, saving throws, skills, HP, and hit dice.
 
 ## Not Yet Implemented / Planned
-1. **HP & Hit Dice**: Maximum HP calculation, hit dice tracking, and expenditure.
-2. **Resources & Spell Slots**: Tracking and recharging resources/spell slots on short/long rests.
-3. **Spells & Features**: Full integration of `FEATURES`, `CLASSES`, `SUBCLASSES`, `SPELLS`, and `SPECIES` registries with spellcasting mechanics and active effects/concentration.
-4. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
-5. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.
+1. **Resources & Spell Slots**: Tracking and recharging resources/spell slots on short/long rests.
+2. **Spells & Features**: Full integration of `FEATURES`, `CLASSES`, `SUBCLASSES`, `SPELLS`, and `SPECIES` registries with spellcasting mechanics and active effects/concentration.
+3. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
+4. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.

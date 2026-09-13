@@ -104,10 +104,9 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Should have Amulet of Health (BASE=100), Ability modifiers (MODIFIERS=200),
-    # Proficiency bonus (MODIFIERS=200), Base combat (250), Saving throws (DERIVED=300),
-    # Skills (DERIVED=300), Scale Mail (DERIVED=300), Shield (DERIVED=310)
-    assert len(updates) == 8
+    # Total updates: Amulet of Health (100), Ability modifiers (200), Proficiency bonus (200),
+    # Base combat (250), Saving throws (300), Skills (300), HP and Hit Dice (300), Scale Mail (300), Shield (310)
+    assert len(updates) == 9
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -143,3 +142,12 @@ def test_saving_throws_and_skills():
     assert skills.get("religion") == 4  # Intelligence +1 + 3 pb
     assert skills.get("insight") == 5   # Wisdom +2 + 3 pb
     assert skills.get("acrobatics") == 3 # Dexterity +3 (not proficient)
+
+
+def test_hp_and_hit_dice():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+
+    assert effective.combat.get("hit_point_max") == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
+    assert effective.combat.get("hit_dice") == {"d8": 6}
