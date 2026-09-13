@@ -46,6 +46,9 @@ spells:
     - hex
     - bless
     - cure_wounds
+  readied:
+    - hex
+    - bless
 
 state:
   hp:

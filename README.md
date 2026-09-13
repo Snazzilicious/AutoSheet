@@ -128,6 +128,8 @@ spells:
   learned:
     - hex
     - cure_wounds
+  readied:
+    - hex
 
 state:
   hp:
@@ -296,6 +298,8 @@ spells:
   learned:
     - hex
     - cure_wounds
+  readied:
+    - hex
 ```
 
 Spell mechanics live in Python.

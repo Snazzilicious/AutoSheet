@@ -31,6 +31,20 @@ def test_load_northstar():
     assert character.state["hp"]["current"] == 37
 
 
+def test_spells_specification():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+
+    assert "learned" in character.spells
+    assert "readied" in character.spells
+    assert "hex" in character.spells["learned"]
+    assert "bless" in character.spells["learned"]
+    assert "cure_wounds" in character.spells["learned"]
+    assert "hex" in character.spells["readied"]
+    assert "bless" in character.spells["readied"]
+    assert "cure_wounds" not in character.spells["readied"]
+
+
 def test_create_effective_character():
     yaml_path = Path(__file__).parent / "Northstar.yaml"
     character = load_character(yaml_path)
