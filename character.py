@@ -387,6 +387,24 @@ def update_hp_and_hit_dice(ctx: CalculationContext) -> None:
     ctx.effective.combat["hit_dice"] = hit_dice
 
 
+def update_spell_slots_and_resources(ctx: CalculationContext) -> None:
+    """
+    Calculate maximum spell slots and resource maximums.
+    """
+    spell_slots_max = {}
+
+    for class_data in ctx.saved.classes:
+        class_name = class_data.get("name", "").lower()
+        level = class_data.get("level", 1)
+        if class_name == "warlock":
+            slot_level = min(5, (level + 1) // 2)
+            slot_count = 3 if level >= 11 else (4 if level >= 17 else 2)
+            spell_slots_max[str(slot_level)] = slot_count
+
+    ctx.effective.combat["spell_slots_max"] = spell_slots_max
+    ctx.effective.combat["resources_max"] = {}
+
+
 def standard_updates(character: SavedCharacter) -> list[Update]:
     return [
         Update(
@@ -418,6 +436,11 @@ def standard_updates(character: SavedCharacter) -> list[Update]:
             priority=DERIVED,
             source="HP and Hit Dice",
             function=update_hp_and_hit_dice,
+        ),
+        Update(
+            priority=DERIVED,
+            source="Spell Slots and Resources",
+            function=update_spell_slots_and_resources,
         ),
     ]
 

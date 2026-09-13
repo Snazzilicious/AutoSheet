@@ -105,8 +105,9 @@ def test_collect_updates_and_calculate():
 
     updates = collect_updates(character)
     # Total updates: Amulet of Health (100), Ability modifiers (200), Proficiency bonus (200),
-    # Base combat (250), Saving throws (300), Skills (300), HP and Hit Dice (300), Scale Mail (300), Shield (310)
-    assert len(updates) == 9
+    # Base combat (250), Saving throws (300), Skills (300), HP and Hit Dice (300),
+    # Spell Slots and Resources (300), Scale Mail (300), Shield (310)
+    assert len(updates) == 10
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -151,3 +152,11 @@ def test_hp_and_hit_dice():
 
     assert effective.combat.get("hit_point_max") == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
     assert effective.combat.get("hit_dice") == {"d8": 6}
+
+
+def test_spell_slots_and_resources():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+
+    assert effective.combat.get("spell_slots_max") == {"3": 2}
