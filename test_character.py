@@ -13,6 +13,8 @@ from character import (
     ITEMS,
     AmuletOfHealth,
     get_active_sources,
+    collect_updates,
+    calculate,
 )
 
 
@@ -80,7 +82,24 @@ def test_active_sources():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    # Northstar has amulet_of_health worn, plus scale_mail armor and shield shield
-    # Since scale_mail and shield are not in ITEMS yet, only amulet_of_health will be collected.
     assert len(sources) == 1
     assert isinstance(sources[0], AmuletOfHealth)
+
+
+def test_collect_updates_and_calculate():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+
+    updates = collect_updates(character)
+    # Should have Amulet of Health (BASE=100) and Ability modifiers (MODIFIERS=200)
+    assert len(updates) == 2
+    assert updates[0].priority == BASE
+    assert updates[1].priority == MODIFIERS
+
+    effective = calculate(character)
+    # Constitution should be 19 due to Amulet of Health, modifier +4
+    assert effective.abilities.constitution == 19
+    assert effective.abilities.constitution_modifier == +4
+    # Dexterity should remain 17 (base), modifier +3
+    assert effective.abilities.dexterity == 17
+    assert effective.abilities.dexterity_modifier == +3

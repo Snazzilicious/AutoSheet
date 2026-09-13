@@ -204,6 +204,43 @@ def update_ability_modifiers(ctx: CalculationContext) -> None:
     abilities.charisma_modifier = ability_modifier(abilities.charisma)
 
 
+def standard_updates(character: SavedCharacter) -> list[Update]:
+    return [
+        Update(
+            priority=MODIFIERS,
+            source="Ability modifiers",
+            function=update_ability_modifiers,
+        )
+    ]
+
+
+def collect_updates(character: SavedCharacter) -> list[Update]:
+    updates = []
+
+    updates.extend(standard_updates(character))
+
+    for source in character.active_sources():
+        updates.extend(source.get_updates())
+
+    updates.sort(key=lambda update: update.priority)
+
+    return updates
+
+
+def calculate(character: SavedCharacter) -> EffectiveCharacter:
+    effective = create_effective_character(character)
+
+    context = CalculationContext(
+        saved=character,
+        effective=effective,
+    )
+
+    for update in collect_updates(character):
+        update.function(context)
+
+    return effective
+
+
 ITEMS = {
     "amulet_of_health": AmuletOfHealth,
 }
