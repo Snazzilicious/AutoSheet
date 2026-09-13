@@ -26,7 +26,7 @@ def test_load_northstar():
     assert character.name == "Northstar"
     assert character.classes[0]["name"] == "Warlock"
     assert character.classes[0]["level"] == 6
-    assert character.abilities["base"]["constitution"] == 16
+    assert character.abilities["constitution"] == 16
     assert character.inventory["amulet_of_health"] == 1
     assert character.state["hp"]["current"] == 37
 

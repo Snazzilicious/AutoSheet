@@ -108,13 +108,12 @@ classes:
     subclass: Celestial
 
 abilities:
-  base:
-    strength: 8
-    dexterity: 17
-    constitution: 16
-    intelligence: 12
-    wisdom: 14
-    charisma: 18
+  strength: 8
+  dexterity: 17
+  constitution: 16
+  intelligence: 12
+  wisdom: 14
+  charisma: 18
 
 proficiencies:
   saving_throws:
@@ -133,10 +132,9 @@ inventory:
   shield: 1
 
 equipment:
-  armor: scale_mail
-  shield: shield
-  worn:
-    - amulet_of_health
+  - scale_mail
+  - shield
+  - amulet_of_health
 
 features:
   - agonizing_blast
@@ -149,6 +147,9 @@ spells:
     - hex
     - bless
     - cure_wounds
+  readied:
+    - hex
+    - bless
 
 state:
   hp:

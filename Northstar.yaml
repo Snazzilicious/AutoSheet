@@ -6,13 +6,12 @@ classes:
     subclass: Celestial
 
 abilities:
-  base:
-    strength: 8
-    dexterity: 17
-    constitution: 16
-    intelligence: 12
-    wisdom: 14
-    charisma: 18
+  strength: 8
+  dexterity: 17
+  constitution: 16
+  intelligence: 12
+  wisdom: 14
+  charisma: 18
 
 proficiencies:
   saving_throws:

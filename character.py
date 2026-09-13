@@ -124,15 +124,13 @@ def create_effective_character(character: SavedCharacter) -> EffectiveCharacter:
     """
     Create initial effective character from persistent character data.
     """
-    base = character.abilities.get("base", {})
-
     abilities = Abilities(
-        strength=base.get("strength", 0),
-        dexterity=base.get("dexterity", 0),
-        constitution=base.get("constitution", 0),
-        intelligence=base.get("intelligence", 0),
-        wisdom=base.get("wisdom", 0),
-        charisma=base.get("charisma", 0),
+        strength=character.abilities.get("strength", 0),
+        dexterity=character.abilities.get("dexterity", 0),
+        constitution=character.abilities.get("constitution", 0),
+        intelligence=character.abilities.get("intelligence", 0),
+        wisdom=character.abilities.get("wisdom", 0),
+        charisma=character.abilities.get("charisma", 0),
     )
 
     return EffectiveCharacter(
