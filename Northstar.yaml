@@ -32,10 +32,9 @@ inventory:
   shield: 1
 
 equipment:
-  armor: scale_mail
-  shield: shield
-  worn:
-    - amulet_of_health
+  - scale_mail
+  - shield
+  - amulet_of_health
 
 features:
   - agonizing_blast

@@ -48,23 +48,9 @@ class SavedCharacter:
             if feature_id in FEATURES:
                 sources.append(FEATURES[feature_id]())
 
-        # Equipped items (worn)
-        for item_id in self.equipment.get("worn", []):
+        # Equipped items
+        for item_id in self.equipment:
             item_class = ITEMS.get(item_id)
-            if item_class is not None:
-                sources.append(item_class())
-
-        # Armor
-        armor = self.equipment.get("armor")
-        if armor:
-            item_class = ITEMS.get(armor)
-            if item_class is not None:
-                sources.append(item_class())
-
-        # Shield
-        shield = self.equipment.get("shield")
-        if shield:
-            item_class = ITEMS.get(shield)
             if item_class is not None:
                 sources.append(item_class())
 
