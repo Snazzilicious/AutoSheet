@@ -1,5 +1,5 @@
 from pathlib import Path
-from character import (
+from autosheet import (
     load_character,
     SavedCharacter,
     create_effective_character,
@@ -10,10 +10,7 @@ from character import (
     MODIFIERS,
     DERIVED,
     FINAL,
-    ITEMS,
-    AmuletOfHealth,
     get_active_sources,
-    collect_updates,
     calculate,
     save_character,
     equip_item,
@@ -22,10 +19,12 @@ from character import (
     short_rest,
     long_rest,
 )
+from autosheet.rules import ITEMS, AmuletOfHealth
+from autosheet.calculation import collect_updates
 
 
 def test_load_northstar():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
 
     assert isinstance(character, SavedCharacter)
@@ -38,7 +37,7 @@ def test_load_northstar():
 
 
 def test_spells_specification():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
 
     assert "learned" in character.spells
@@ -52,7 +51,7 @@ def test_spells_specification():
 
 
 def test_create_effective_character():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = create_effective_character(character)
 
@@ -68,7 +67,7 @@ def test_update_and_priorities():
     assert DERIVED == 300
     assert FINAL == 400
 
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = create_effective_character(character)
 
@@ -98,7 +97,7 @@ def test_rule_registries_and_amulet():
 
 
 def test_active_sources():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
@@ -106,7 +105,7 @@ def test_active_sources():
 
 
 def test_collect_updates_and_calculate():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
@@ -124,7 +123,7 @@ def test_collect_updates_and_calculate():
 
 
 def test_combat_statistics():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = calculate(character)
 
@@ -134,7 +133,7 @@ def test_combat_statistics():
 
 
 def test_saving_throws_and_skills():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = calculate(character)
 
@@ -150,7 +149,7 @@ def test_saving_throws_and_skills():
 
 
 def test_hp_and_hit_dice():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = calculate(character)
 
@@ -159,7 +158,7 @@ def test_hp_and_hit_dice():
 
 
 def test_spell_slots_and_resources():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     effective = calculate(character)
 
@@ -167,7 +166,7 @@ def test_spell_slots_and_resources():
 
 
 def test_registries_and_features():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
@@ -182,7 +181,7 @@ def test_registries_and_features():
 
 
 def test_conditions_and_effects():
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
     character.state["conditions"] = ["poisoned"]
     character.state["active_effects"] = [{"id": "hex", "duration_remaining": 47}]
@@ -193,7 +192,7 @@ def test_conditions_and_effects():
 
 
 def test_actions_and_saving(tmp_path):
-    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
     character = load_character(yaml_path)
 
     # Initial CON with Amulet equipped
