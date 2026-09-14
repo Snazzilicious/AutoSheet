@@ -104,8 +104,8 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Total updates: 7 standard + 3 items + 4 features = 14 updates
-    assert len(updates) == 14
+    # Total updates: 8 standard + 3 items + 4 features = 15 updates
+    assert len(updates) == 15
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -173,3 +173,14 @@ def test_registries_and_features():
     assert "repelling_blast" in effective.features
     assert "eldritch_mind" in effective.features
     assert "devils_sight" in effective.features
+
+
+def test_conditions_and_effects():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    character.state["conditions"] = ["poisoned"]
+    character.state["active_effects"] = [{"id": "hex", "duration_remaining": 47}]
+    
+    effective = calculate(character)
+    assert effective.combat.get("conditions") == ["poisoned"]
+    assert effective.combat.get("active_effects") == [{"id": "hex", "duration_remaining": 47}]

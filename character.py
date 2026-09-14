@@ -408,6 +408,18 @@ def update_spell_slots_and_resources(ctx: CalculationContext) -> None:
     ctx.effective.combat["resources_max"] = {}
 
 
+def update_conditions_and_effects(ctx: CalculationContext) -> None:
+    """
+    Process active conditions and temporary effects from saved character state.
+    """
+    state = ctx.saved.state
+    conditions = state.get("conditions", [])
+    active_effects = state.get("active_effects", [])
+
+    ctx.effective.combat["conditions"] = list(conditions)
+    ctx.effective.combat["active_effects"] = list(active_effects)
+
+
 def standard_updates(character: SavedCharacter) -> list[Update]:
     return [
         Update(
@@ -444,6 +456,11 @@ def standard_updates(character: SavedCharacter) -> list[Update]:
             priority=DERIVED,
             source="Spell Slots and Resources",
             function=update_spell_slots_and_resources,
+        ),
+        Update(
+            priority=DERIVED,
+            source="Conditions and Effects",
+            function=update_conditions_and_effects,
         ),
     ]
 

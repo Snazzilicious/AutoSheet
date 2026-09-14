@@ -21,9 +21,10 @@
    - Hit dice tracking per class/die type.
 8. **Resources & Spell Slots**:
    - Maximum spell slot calculation based on class levels (e.g., Warlock Pact Magic progression).
-9. **Test Suite**:
-   - 12 passing unit tests covering loading, effective stats, rules, active sources, registries, features, combat statistics, saving throws, skills, HP, hit dice, and spell slots.
+9. **Conditions & Temporary Effects**:
+   - Processing active conditions and temporary effects (`active_effects`) from character state.
+10. **Test Suite**:
+    - 13 passing unit tests covering loading, effective stats, rules, active sources, registries, features, combat statistics, saving throws, skills, HP, hit dice, spell slots, conditions, and active effects.
 
 ## Not Yet Implemented / Planned
 1. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
-2. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.
