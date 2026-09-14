@@ -57,25 +57,27 @@ This avoids storing derived values and avoids complicated rollback logic.
 
 ## Project Structure
 
-A planned structure is:
+The project structure is organized as:
 
 ```text
-dnd-character/
+autosheet/
 ├── characters/
-│   └── northstar.yaml
-├── dnd/
-│   ├── character.py
+│   └── Northstar.yaml
+├── autosheet/
+│   ├── __init__.py
+│   ├── core.py
 │   ├── calculation.py
-│   ├── rules.py
-│   ├── items.py
-│   ├── classes.py
-│   ├── features.py
-│   └── spells.py
+│   ├── actions.py
+│   └── rules/
+│       ├── __init__.py
+│       ├── items.py
+│       ├── classes.py
+│       ├── features.py
+│       └── spells.py
 ├── tests/
-└── main.py
+│   └── test_character.py
+└── requirements.txt
 ```
-
-The exact structure may evolve.
 
 ## Character Files
 
