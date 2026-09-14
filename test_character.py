@@ -96,7 +96,7 @@ def test_active_sources():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    assert len(sources) == 3
+    assert len(sources) == 9
 
 
 def test_collect_updates_and_calculate():
@@ -104,10 +104,8 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Total updates: Amulet of Health (100), Ability modifiers (200), Proficiency bonus (200),
-    # Base combat (250), Saving throws (300), Skills (300), HP and Hit Dice (300),
-    # Spell Slots and Resources (300), Scale Mail (300), Shield (310)
-    assert len(updates) == 10
+    # Total updates: 7 standard + 3 items + 4 features = 14 updates
+    assert len(updates) == 14
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -160,3 +158,18 @@ def test_spell_slots_and_resources():
     effective = calculate(character)
 
     assert effective.combat.get("spell_slots_max") == {"3": 2}
+
+
+def test_registries_and_features():
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+    sources = get_active_sources(character)
+    
+    # 1 class (Warlock) + 1 subclass (Celestial) + 4 features + 3 items = 9 sources
+    assert len(sources) == 9
+
+    effective = calculate(character)
+    assert "agonizing_blast" in effective.features
+    assert "repelling_blast" in effective.features
+    assert "eldritch_mind" in effective.features
+    assert "devils_sight" in effective.features

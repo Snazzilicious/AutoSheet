@@ -37,11 +37,14 @@ class SavedCharacter:
         """
         sources = []
 
-        # Classes
+        # Classes and Subclasses
         for class_data in self.classes:
             class_name = class_data.get("name")
             if class_name in CLASSES:
                 sources.append(CLASSES[class_name](class_data))
+            subclass_name = class_data.get("subclass")
+            if subclass_name in SUBCLASSES:
+                sources.append(SUBCLASSES[subclass_name](class_data))
 
         # Features
         for feature_id in self.features:
@@ -472,14 +475,91 @@ def calculate(character: SavedCharacter) -> EffectiveCharacter:
     return effective
 
 
+class AgonizingBlast:
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=FINAL,
+                source="Agonizing Blast",
+                function=lambda ctx: ctx.effective.features.add("agonizing_blast"),
+            )
+        ]
+
+
+class RepellingBlast:
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=FINAL,
+                source="Repelling Blast",
+                function=lambda ctx: ctx.effective.features.add("repelling_blast"),
+            )
+        ]
+
+
+class EldritchMind:
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=FINAL,
+                source="Eldritch Mind",
+                function=lambda ctx: ctx.effective.features.add("eldritch_mind"),
+            )
+        ]
+
+
+class DevilsSight:
+    def get_updates(self) -> list[Update]:
+        return [
+            Update(
+                priority=FINAL,
+                source="Devil's Sight",
+                function=lambda ctx: ctx.effective.features.add("devils_sight"),
+            )
+        ]
+
+
+class WarlockClass:
+    def __init__(self, data: dict[str, Any]):
+        self.data = data
+
+    def get_updates(self) -> list[Update]:
+        return []
+
+
+class CelestialSubclass:
+    def __init__(self, data: dict[str, Any]):
+        self.data = data
+
+    def get_updates(self) -> list[Update]:
+        return []
+
+
 ITEMS = {
     "amulet_of_health": AmuletOfHealth,
     "scale_mail": ScaleMail,
     "shield": Shield,
 }
 
-FEATURES: dict[str, Any] = {}
-CLASSES: dict[str, Any] = {}
-SUBCLASSES: dict[str, Any] = {}
-SPELLS: dict[str, Any] = {}
+FEATURES = {
+    "agonizing_blast": AgonizingBlast,
+    "repelling_blast": RepellingBlast,
+    "eldritch_mind": EldritchMind,
+    "devils_sight": DevilsSight,
+}
+
+CLASSES = {
+    "Warlock": WarlockClass,
+}
+
+SUBCLASSES = {
+    "Celestial": CelestialSubclass,
+}
+
+SPELLS = {
+    "hex": "Hex",
+    "bless": "Bless",
+    "cure_wounds": "Cure Wounds",
+}
+
 SPECIES: dict[str, Any] = {}

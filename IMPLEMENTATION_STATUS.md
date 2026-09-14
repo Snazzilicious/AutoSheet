@@ -7,8 +7,8 @@
    - Supports priority levels (`BASE = 100`, `MODIFIERS = 200`, `DERIVED = 300`, `FINAL = 400`).
    - Implements `CalculationContext`, `Update`, and `calculate()` pipeline.
 4. **Active Sources & Registries**:
-   - `active_sources()` collects active items/features.
-   - `ITEMS` registry with `Amulet of Health`, `Scale Mail`, and `Shield` rules.
+   - `active_sources()` collects active items/features, classes, and subclasses.
+   - Populated registries for `ITEMS`, `FEATURES`, `CLASSES`, `SUBCLASSES`, and `SPELLS`.
 5. **Combat Statistics & Proficiency Bonus**:
    - Proficiency bonus calculation based on total character level (`(total_level - 1) // 4 + 2`).
    - Armor Class (AC) calculation incorporating base unarmored AC, medium armor (Scale Mail with Dex cap), and shields.
@@ -22,9 +22,8 @@
 8. **Resources & Spell Slots**:
    - Maximum spell slot calculation based on class levels (e.g., Warlock Pact Magic progression).
 9. **Test Suite**:
-   - 11 passing unit tests covering loading, effective stats, rules, active sources, combat statistics, saving throws, skills, HP, hit dice, and spell slots.
+   - 12 passing unit tests covering loading, effective stats, rules, active sources, registries, features, combat statistics, saving throws, skills, HP, hit dice, and spell slots.
 
 ## Not Yet Implemented / Planned
-1. **Spells & Features**: Full integration of `FEATURES`, `CLASSES`, `SUBCLASSES`, `SPELLS`, and `SPECIES` registries with spellcasting mechanics and active effects/concentration.
-2. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
-3. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.
+1. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
+2. **Conditions & Temporary Effects**: Poisoned, active effects, and duration tracking.
