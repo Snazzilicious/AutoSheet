@@ -18,19 +18,14 @@ The architecture supports:
 - Automatic ability modifiers
 - Rule updates with priorities
 - Equipment-driven effects
-
-Planned capabilities include:
-
 - Automatic AC and combat calculations
 - Saving throws and skill bonuses
-- Spell slot tracking
-- Spell casting
-- Class resources
+- Proficiency bonus calculation
+- HP and hit dice calculation
+- Spell slot tracking and casting
 - Short and long rests
-- Conditions
-- Temporary effects
-- Consumables
-- Automated actions
+- Conditions and temporary effects
+- Item equipping/unequipping and state mutation/saving
 
 ## Core Concept
 
@@ -97,13 +92,12 @@ classes:
     subclass: Celestial
 
 abilities:
-  base:
-    strength: 8
-    dexterity: 17
-    constitution: 16
-    intelligence: 12
-    wisdom: 14
-    charisma: 18
+  strength: 8
+  dexterity: 17
+  constitution: 16
+  intelligence: 12
+  wisdom: 14
+  charisma: 18
 
 proficiencies:
   saving_throws:
@@ -115,10 +109,9 @@ inventory:
   amulet_of_health: 1
 
 equipment:
-  armor: scale_mail
-  shield: shield
-  worn:
-    - amulet_of_health
+  - scale_mail
+  - shield
+  - amulet_of_health
 
 features:
   - agonizing_blast
@@ -387,7 +380,13 @@ Do not attempt to implement the entire D&D ruleset at once.
 
 ## Testing
 
-Tests should correspond to real rules and user-visible behavior.
+Tests can be run using `pytest`:
+
+```bash
+pytest
+```
+
+Tests correspond to real rules and user-visible behavior.
 
 Examples:
 
