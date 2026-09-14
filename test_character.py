@@ -15,6 +15,12 @@ from character import (
     get_active_sources,
     collect_updates,
     calculate,
+    save_character,
+    equip_item,
+    unequip_item,
+    cast_spell,
+    short_rest,
+    long_rest,
 )
 
 
@@ -184,3 +190,37 @@ def test_conditions_and_effects():
     effective = calculate(character)
     assert effective.combat.get("conditions") == ["poisoned"]
     assert effective.combat.get("active_effects") == [{"id": "hex", "duration_remaining": 47}]
+
+
+def test_actions_and_saving(tmp_path):
+    yaml_path = Path(__file__).parent / "Northstar.yaml"
+    character = load_character(yaml_path)
+
+    # Initial CON with Amulet equipped
+    effective = calculate(character)
+    assert effective.abilities.constitution == 19
+
+    # Unequip Amulet of Health
+    unequip_item(character, "amulet_of_health")
+    effective_unequipped = calculate(character)
+    assert effective_unequipped.abilities.constitution == 16  # Base CON
+    assert effective_unequipped.abilities.constitution_modifier == 3
+
+    # Save character to temp file and reload
+    temp_yaml = tmp_path / "Northstar_saved.yaml"
+    save_character(character, temp_yaml)
+    reloaded = load_character(temp_yaml)
+    assert "amulet_of_health" not in reloaded.equipment
+
+    # Cast spell & Long rest test
+    character.state["spell_slots"] = {"3": 2}
+    assert cast_spell(character, 3) is True
+    assert character.state["spell_slots"]["3"] == 1
+
+    character.state["hp"]["current"] = 10
+    character.state["conditions"] = ["poisoned"]
+    equip_item(character, "amulet_of_health")
+    long_rest(character)
+    assert character.state["hp"]["current"] == 57  # Max HP
+    assert character.state["spell_slots"]["3"] == 2  # Restored
+    assert character.state["conditions"] == []

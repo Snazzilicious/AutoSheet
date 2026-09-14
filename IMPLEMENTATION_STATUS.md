@@ -23,8 +23,11 @@
    - Maximum spell slot calculation based on class levels (e.g., Warlock Pact Magic progression).
 9. **Conditions & Temporary Effects**:
    - Processing active conditions and temporary effects (`active_effects`) from character state.
-10. **Test Suite**:
-    - 13 passing unit tests covering loading, effective stats, rules, active sources, registries, features, combat statistics, saving throws, skills, HP, hit dice, spell slots, conditions, and active effects.
+10. **Actions & State Mutators**:
+    - Player actions (`equip_item`, `unequip_item`, `cast_spell`, `short_rest`, `long_rest`) mutating persistent state.
+    - Character serialization to YAML (`save_character`).
+11. **Test Suite**:
+    - 14 passing unit tests covering loading, effective stats, rules, active sources, registries, features, combat statistics, saving throws, skills, HP, hit dice, spell slots, conditions, active effects, item equipping/unequipping, spells casting, rests, and YAML round-tripping.
 
 ## Not Yet Implemented / Planned
-1. **Actions & State Mutators**: Player actions (attacking, casting, resting, equipping/unequipping) that mutate `SavedCharacter` persistent state and serialize back to YAML.
+None (all initial design phases and steps completed).
