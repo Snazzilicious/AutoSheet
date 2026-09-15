@@ -9,23 +9,17 @@ from autosheet.core import (
     DERIVED,
 )
 
+ABILITIES_LIST = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+
 
 def create_effective_character(character: SavedCharacter) -> EffectiveCharacter:
     """
     Create initial effective character from persistent character data.
     """
     abilities = Abilities(
-        strength=character.abilities.get("strength", 0),
-        dexterity=character.abilities.get("dexterity", 0),
-        constitution=character.abilities.get("constitution", 0),
-        intelligence=character.abilities.get("intelligence", 0),
-        wisdom=character.abilities.get("wisdom", 0),
-        charisma=character.abilities.get("charisma", 0),
+        **{name: character.abilities.get(name, 0) for name in ABILITIES_LIST}
     )
-
-    return EffectiveCharacter(
-        abilities=abilities,
-    )
+    return EffectiveCharacter(abilities=abilities)
 
 
 def ability_modifier(score: int) -> int:
@@ -39,14 +33,9 @@ def update_ability_modifiers(ctx: CalculationContext) -> None:
     """
     Calculate all six ability modifiers.
     """
-    abilities = ctx.effective.abilities
-
-    abilities.strength_modifier = ability_modifier(abilities.strength)
-    abilities.dexterity_modifier = ability_modifier(abilities.dexterity)
-    abilities.constitution_modifier = ability_modifier(abilities.constitution)
-    abilities.intelligence_modifier = ability_modifier(abilities.intelligence)
-    abilities.wisdom_modifier = ability_modifier(abilities.wisdom)
-    abilities.charisma_modifier = ability_modifier(abilities.charisma)
+    ab = ctx.effective.abilities
+    for name in ABILITIES_LIST:
+        setattr(ab, f"{name}_modifier", ability_modifier(getattr(ab, name)))
 
 
 def update_proficiency_bonus(ctx: CalculationContext) -> None:
@@ -93,54 +82,30 @@ def update_saving_throws(ctx: CalculationContext) -> None:
     """
     Calculate saving throw bonuses.
     """
-    abilities = ctx.effective.abilities
+    ab = ctx.effective.abilities
     pb = ctx.effective.combat.get("proficiency_bonus", 2)
     prof_saves = set(ctx.saved.proficiencies.get("saving_throws", []))
 
-    ability_map = {
-        "strength": abilities.strength_modifier,
-        "dexterity": abilities.dexterity_modifier,
-        "constitution": abilities.constitution_modifier,
-        "intelligence": abilities.intelligence_modifier,
-        "wisdom": abilities.wisdom_modifier,
-        "charisma": abilities.charisma_modifier,
+    ctx.effective.combat["saving_throws"] = {
+        name: getattr(ab, f"{name}_modifier") + (pb if name in prof_saves else 0)
+        for name in ABILITIES_LIST
     }
-
-    saves = {}
-    for ability, mod in ability_map.items():
-        bonus = mod + (pb if ability in prof_saves else 0)
-        saves[ability] = bonus
-
-    ctx.effective.combat["saving_throws"] = saves
 
 
 def update_skills(ctx: CalculationContext) -> None:
     """
     Calculate skill bonuses.
     """
-    abilities = ctx.effective.abilities
+    ab = ctx.effective.abilities
     pb = ctx.effective.combat.get("proficiency_bonus", 2)
     skills_data = ctx.saved.proficiencies.get("skills", {})
     prof_skills = set(skills_data.get("proficient", []))
     exp_skills = set(skills_data.get("expertise", []))
 
-    ability_map = {
-        "strength": abilities.strength_modifier,
-        "dexterity": abilities.dexterity_modifier,
-        "constitution": abilities.constitution_modifier,
-        "intelligence": abilities.intelligence_modifier,
-        "wisdom": abilities.wisdom_modifier,
-        "charisma": abilities.charisma_modifier,
-    }
-
     skill_bonuses = {}
     for skill, ability_name in SKILL_ABILITIES.items():
-        mod = ability_map.get(ability_name, 0)
-        mult = 0
-        if skill in exp_skills:
-            mult = 2
-        elif skill in prof_skills:
-            mult = 1
+        mod = getattr(ab, f"{ability_name}_modifier", 0)
+        mult = 2 if skill in exp_skills else (1 if skill in prof_skills else 0)
         skill_bonuses[skill] = mod + (mult * pb)
 
     ctx.effective.combat["skill_bonuses"] = skill_bonuses

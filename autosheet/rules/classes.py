@@ -2,7 +2,7 @@ from typing import Any
 from autosheet.core import Update
 
 
-class WarlockClass:
+class BaseRule:
     def __init__(self, data: dict[str, Any]):
         self.data = data
 
@@ -10,18 +10,6 @@ class WarlockClass:
         return []
 
 
-class CelestialSubclass:
-    def __init__(self, data: dict[str, Any]):
-        self.data = data
+CLASSES = {"Warlock": BaseRule}
+SUBCLASSES = {"Celestial": BaseRule}
 
-    def get_updates(self) -> list[Update]:
-        return []
-
-
-CLASSES = {
-    "Warlock": WarlockClass,
-}
-
-SUBCLASSES = {
-    "Celestial": CelestialSubclass,
-}
