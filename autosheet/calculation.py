@@ -4,7 +4,7 @@ from autosheet.core import (
     EffectiveCharacter,
     Abilities,
     CalculationContext,
-    Update,
+    Rule,
     MODIFIERS,
     DERIVED,
 )
@@ -29,31 +29,31 @@ def ability_modifier(score: int) -> int:
     return (score - 10) // 2
 
 
-def update_ability_modifiers(ctx: CalculationContext) -> None:
+def update_ability_modifiers(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate all six ability modifiers.
     """
-    ab = ctx.effective.abilities
+    ab = effective.abilities
     for name in ABILITIES_LIST:
         setattr(ab, f"{name}_modifier", ability_modifier(getattr(ab, name)))
 
 
-def update_proficiency_bonus(ctx: CalculationContext) -> None:
+def update_proficiency_bonus(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate proficiency bonus based on total character level.
     """
-    total_level = sum(c.get("level", 0) for c in ctx.saved.classes)
+    total_level = sum(c.get("level", 0) for c in saved.classes)
     pb = (total_level - 1) // 4 + 2 if total_level > 0 else 2
-    ctx.effective.combat["proficiency_bonus"] = pb
+    effective.combat["proficiency_bonus"] = pb
 
 
-def update_base_combat(ctx: CalculationContext) -> None:
+def update_base_combat(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate base unarmored AC and initiative.
     """
-    dex_mod = ctx.effective.abilities.dexterity_modifier
-    ctx.effective.combat["ac"] = 10 + dex_mod
-    ctx.effective.combat["initiative"] = dex_mod
+    dex_mod = effective.abilities.dexterity_modifier
+    effective.combat["ac"] = 10 + dex_mod
+    effective.combat["initiative"] = dex_mod
 
 
 SKILL_ABILITIES = {
@@ -78,27 +78,27 @@ SKILL_ABILITIES = {
 }
 
 
-def update_saving_throws(ctx: CalculationContext) -> None:
+def update_saving_throws(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate saving throw bonuses.
     """
-    ab = ctx.effective.abilities
-    pb = ctx.effective.combat.get("proficiency_bonus", 2)
-    prof_saves = set(ctx.saved.proficiencies.get("saving_throws", []))
+    ab = effective.abilities
+    pb = effective.combat.get("proficiency_bonus", 2)
+    prof_saves = set(saved.proficiencies.get("saving_throws", []))
 
-    ctx.effective.combat["saving_throws"] = {
+    effective.combat["saving_throws"] = {
         name: getattr(ab, f"{name}_modifier") + (pb if name in prof_saves else 0)
         for name in ABILITIES_LIST
     }
 
 
-def update_skills(ctx: CalculationContext) -> None:
+def update_skills(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate skill bonuses.
     """
-    ab = ctx.effective.abilities
-    pb = ctx.effective.combat.get("proficiency_bonus", 2)
-    skills_data = ctx.saved.proficiencies.get("skills", {})
+    ab = effective.abilities
+    pb = effective.combat.get("proficiency_bonus", 2)
+    skills_data = saved.proficiencies.get("skills", {})
     prof_skills = set(skills_data.get("proficient", []))
     exp_skills = set(skills_data.get("expertise", []))
 
@@ -108,7 +108,7 @@ def update_skills(ctx: CalculationContext) -> None:
         mult = 2 if skill in exp_skills else (1 if skill in prof_skills else 0)
         skill_bonuses[skill] = mod + (mult * pb)
 
-    ctx.effective.combat["skill_bonuses"] = skill_bonuses
+    effective.combat["skill_bonuses"] = skill_bonuses
 
 
 CLASS_HIT_DIE = {
@@ -127,16 +127,16 @@ CLASS_HIT_DIE = {
 }
 
 
-def update_hp_and_hit_dice(ctx: CalculationContext) -> None:
+def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate maximum hit points and hit dice.
     """
-    con_mod = ctx.effective.abilities.constitution_modifier
+    con_mod = effective.abilities.constitution_modifier
     total_hp = 0
     hit_dice = {}
 
     first_level = True
-    for class_data in ctx.saved.classes:
+    for class_data in saved.classes:
         class_name = class_data.get("name", "").lower()
         level = class_data.get("level", 1)
         die = CLASS_HIT_DIE.get(class_name, 8)
@@ -154,17 +154,17 @@ def update_hp_and_hit_dice(ctx: CalculationContext) -> None:
         die_key = f"d{die}"
         hit_dice[die_key] = hit_dice.get(die_key, 0) + level
 
-    ctx.effective.combat["hit_point_max"] = total_hp
-    ctx.effective.combat["hit_dice"] = hit_dice
+    effective.combat["hit_point_max"] = total_hp
+    effective.combat["hit_dice"] = hit_dice
 
 
-def update_spell_slots_and_resources(ctx: CalculationContext) -> None:
+def update_spell_slots_and_resources(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate maximum spell slots and resource maximums.
     """
     spell_slots_max = {}
 
-    for class_data in ctx.saved.classes:
+    for class_data in saved.classes:
         class_name = class_data.get("name", "").lower()
         level = class_data.get("level", 1)
         if class_name == "warlock":
@@ -172,60 +172,60 @@ def update_spell_slots_and_resources(ctx: CalculationContext) -> None:
             slot_count = 3 if level >= 11 else (4 if level >= 17 else 2)
             spell_slots_max[str(slot_level)] = slot_count
 
-    ctx.effective.combat["spell_slots_max"] = spell_slots_max
-    ctx.effective.combat["resources_max"] = {}
+    effective.combat["spell_slots_max"] = spell_slots_max
+    effective.combat["resources_max"] = {}
 
 
-def update_conditions_and_effects(ctx: CalculationContext) -> None:
+def update_conditions_and_effects(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Process active conditions and temporary effects from saved character state.
     """
-    state = ctx.saved.state
+    state = saved.state
     conditions = state.get("conditions", [])
     active_effects = state.get("active_effects", [])
 
-    ctx.effective.combat["conditions"] = list(conditions)
-    ctx.effective.combat["active_effects"] = list(active_effects)
+    effective.combat["conditions"] = list(conditions)
+    effective.combat["active_effects"] = list(active_effects)
 
 
-def standard_updates(character: SavedCharacter) -> list[Update]:
+def standard_updates(character: SavedCharacter) -> list[Rule]:
     return [
-        Update(
+        Rule(
             priority=MODIFIERS,
             source="Ability modifiers",
             function=update_ability_modifiers,
         ),
-        Update(
+        Rule(
             priority=MODIFIERS,
             source="Proficiency bonus",
             function=update_proficiency_bonus,
         ),
-        Update(
+        Rule(
             priority=250,
             source="Base combat",
             function=update_base_combat,
         ),
-        Update(
+        Rule(
             priority=DERIVED,
             source="Saving throws",
             function=update_saving_throws,
         ),
-        Update(
+        Rule(
             priority=DERIVED,
             source="Skills",
             function=update_skills,
         ),
-        Update(
+        Rule(
             priority=DERIVED,
             source="HP and Hit Dice",
             function=update_hp_and_hit_dice,
         ),
-        Update(
+        Rule(
             priority=DERIVED,
             source="Spell Slots and Resources",
             function=update_spell_slots_and_resources,
         ),
-        Update(
+        Rule(
             priority=DERIVED,
             source="Conditions and Effects",
             function=update_conditions_and_effects,
@@ -233,7 +233,7 @@ def standard_updates(character: SavedCharacter) -> list[Update]:
     ]
 
 
-def collect_updates(character: SavedCharacter) -> list[Update]:
+def collect_updates(character: SavedCharacter) -> list[Rule]:
     updates = []
 
     updates.extend(standard_updates(character))
@@ -249,16 +249,9 @@ def collect_updates(character: SavedCharacter) -> list[Update]:
 def calculate(character: SavedCharacter) -> EffectiveCharacter:
     effective = create_effective_character(character)
 
-    context = CalculationContext(
-        saved=character,
-        effective=effective,
-    )
-
     for update in collect_updates(character):
-        update.function(context)
+        update.function(character,effective)
 
     return effective
 
 
-def get_active_sources(character: SavedCharacter) -> list[Any]:
-    return character.active_sources()

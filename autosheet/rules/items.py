@@ -1,67 +1,65 @@
-from autosheet.core import Update, CalculationContext, BASE, DERIVED
+from autosheet.core import Rule, BASE, DERIVED
 
 
-class AmuletOfHealth:
+class Item(Rule):
+    """
+    An entry in the EffectiveCharacter's inventory list
+    Has a short name for display
+    Provides a description of the item
+    May grant a Feature and/or Action
+    """
+    def __init__( self, equipped: bool = False ):
+        self.equipped = equipped
+        super()__init__( priority=self.priority, source=self.name, function=self.apply_effect_if_equipped )
+    
+    def apply_effect_if_equipped( self, saved: SavedCharacter, effective: EffectiveCharacter ) -> None :
+        if self.equipped:
+            self.apply_effect( saved, effective )
+    
+    def apply_effect( self, saved: SavedCharacter, effective: EffectiveCharacter ) -> None :
+        pass
+    
+    def equip(self):
+        self.equipped = True
+    
+    def unequip(self):
+        self.equipped = False
+
+
+class AmuletOfHealth(Item):
     """
     Amulet of Health: Your Constitution score is 19 while wearing the amulet.
     """
+    name = "Amulet of Health"
+    priority = BASE
 
-    def get_updates(self) -> list[Update]:
-        return [
-            Update(
-                priority=BASE,
-                source="Amulet of Health",
-                function=self.update_constitution,
-            )
-        ]
-
-    @staticmethod
-    def update_constitution(ctx: CalculationContext) -> None:
-        ctx.effective.abilities.constitution = max(
-            ctx.effective.abilities.constitution,
-            19,
-        )
+    def apply_effect(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
+        effective.abilities.constitution = max( 19, effective.abilities.constitution )
 
 
-class ScaleMail:
+class ScaleMail(Item):
     """
     Scale Mail: Medium armor, AC 14 + Dex modifier (max +2).
     """
+    name="Scale Mail"
+    priority=DERIVED
 
-    def get_updates(self) -> list[Update]:
-        return [
-            Update(
-                priority=DERIVED,
-                source="Scale Mail",
-                function=self.update_ac,
-            )
-        ]
-
-    @staticmethod
-    def update_ac(ctx: CalculationContext) -> None:
-        dex_mod = ctx.effective.abilities.dexterity_modifier
+    def apply_effect(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
+        dex_mod = effective.abilities.dexterity_modifier
         armor_ac = 14 + min(dex_mod, 2)
-        current_ac = ctx.effective.combat.get("ac", 10 + dex_mod)
-        ctx.effective.combat["ac"] = max(current_ac, armor_ac)
+        current_ac = effective.combat.get("ac", 10 + dex_mod)
+        effective.combat["ac"] = max(current_ac, armor_ac)
 
 
-class Shield:
+class Shield(Item):
     """
     Shield: +2 AC.
     """
+    name="Shield"
+    priority=DERIVED+10
 
-    def get_updates(self) -> list[Update]:
-        return [
-            Update(
-                priority=DERIVED + 10,
-                source="Shield",
-                function=self.update_shield,
-            )
-        ]
-
-    @staticmethod
-    def update_shield(ctx: CalculationContext) -> None:
-        ctx.effective.combat["ac"] = ctx.effective.combat.get("ac", 10) + 2
+    def apply_effect(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
+        effective.combat["ac"] = effective.combat.get("ac", 10) + 2
 
 
 ITEMS = {
