@@ -2,8 +2,9 @@ from typing import Any
 from autosheet.core import (
     SavedCharacter,
     EffectiveCharacter,
-    Abilities,
-    CalculationContext,
+    AbilityScores,
+    AbilityModifiers,
+    HitPoints,
     Rule,
     MODIFIERS,
     DERIVED,
@@ -16,10 +17,14 @@ def create_effective_character(character: SavedCharacter) -> EffectiveCharacter:
     """
     Create initial effective character from persistent character data.
     """
-    abilities = Abilities(
-        **{name: character.abilities.get(name, 0) for name in ABILITIES_LIST}
+    total_level = sum(c.get("level", 0) for c in character.classes)
+    scores = {name: character.abilities.get(name, 0) for name in ABILITIES_LIST}
+    return EffectiveCharacter(
+        name=character.name,
+        level=total_level,
+        abilities=AbilityScores(**scores),
+        ability_modifiers=AbilityModifiers(**{name: ability_modifier(score) for name, score in scores.items()})
     )
-    return EffectiveCharacter(abilities=abilities)
 
 
 def ability_modifier(score: int) -> int:
@@ -34,26 +39,29 @@ def update_ability_modifiers(saved: SavedCharacter, effective: EffectiveCharacte
     Calculate all six ability modifiers.
     """
     ab = effective.abilities
+    mods = effective.ability_modifiers
     for name in ABILITIES_LIST:
-        setattr(ab, f"{name}_modifier", ability_modifier(getattr(ab, name)))
+        score = getattr(ab, name)
+        mod = ability_modifier(score)
+        setattr(mods, name, mod)
 
 
 def update_proficiency_bonus(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate proficiency bonus based on total character level.
     """
-    total_level = sum(c.get("level", 0) for c in saved.classes)
+    total_level = effective.level
     pb = (total_level - 1) // 4 + 2 if total_level > 0 else 2
-    effective.combat["proficiency_bonus"] = pb
+    effective.proficiency_bonus = pb
 
 
 def update_base_combat(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate base unarmored AC and initiative.
     """
-    dex_mod = effective.abilities.dexterity_modifier
-    effective.combat["ac"] = 10 + dex_mod
-    effective.combat["initiative"] = dex_mod
+    dex_mod = effective.ability_modifiers.dexterity
+    effective.armor_class = 10 + dex_mod
+    effective.initiative = dex_mod
 
 
 SKILL_ABILITIES = {
@@ -82,12 +90,12 @@ def update_saving_throws(saved: SavedCharacter, effective: EffectiveCharacter) -
     """
     Calculate saving throw bonuses.
     """
-    ab = effective.abilities
-    pb = effective.combat.get("proficiency_bonus", 2)
+    mods = effective.ability_modifiers
+    pb = effective.proficiency_bonus
     prof_saves = set(saved.proficiencies.get("saving_throws", []))
 
-    effective.combat["saving_throws"] = {
-        name: getattr(ab, f"{name}_modifier") + (pb if name in prof_saves else 0)
+    effective.saving_throws = {
+        name: getattr(mods, name) + (pb if name in prof_saves else 0)
         for name in ABILITIES_LIST
     }
 
@@ -96,19 +104,19 @@ def update_skills(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
     Calculate skill bonuses.
     """
-    ab = effective.abilities
-    pb = effective.combat.get("proficiency_bonus", 2)
+    mods = effective.ability_modifiers
+    pb = effective.proficiency_bonus
     skills_data = saved.proficiencies.get("skills", {})
     prof_skills = set(skills_data.get("proficient", []))
     exp_skills = set(skills_data.get("expertise", []))
 
     skill_bonuses = {}
     for skill, ability_name in SKILL_ABILITIES.items():
-        mod = getattr(ab, f"{ability_name}_modifier", 0)
+        mod = getattr(mods, ability_name, 0)
         mult = 2 if skill in exp_skills else (1 if skill in prof_skills else 0)
         skill_bonuses[skill] = mod + (mult * pb)
 
-    effective.combat["skill_bonuses"] = skill_bonuses
+    effective.skills = skill_bonuses
 
 
 CLASS_HIT_DIE = {
@@ -131,7 +139,7 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
     """
     Calculate maximum hit points and hit dice.
     """
-    con_mod = effective.abilities.constitution_modifier
+    con_mod = effective.ability_modifiers.constitution
     total_hp = 0
     hit_dice = {}
 
@@ -154,8 +162,9 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
         die_key = f"d{die}"
         hit_dice[die_key] = hit_dice.get(die_key, 0) + level
 
-    effective.combat["hit_point_max"] = total_hp
-    effective.combat["hit_dice"] = hit_dice
+    effective.hit_points.max = total_hp
+    effective.hit_points.current = saved.state.get("hp", {}).get("current", total_hp)
+    effective.hit_dice = hit_dice
 
 
 def update_spell_slots_and_resources(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
@@ -172,8 +181,7 @@ def update_spell_slots_and_resources(saved: SavedCharacter, effective: Effective
             slot_count = 3 if level >= 11 else (4 if level >= 17 else 2)
             spell_slots_max[str(slot_level)] = slot_count
 
-    effective.combat["spell_slots_max"] = spell_slots_max
-    effective.combat["resources_max"] = {}
+    effective.spell_slots_max = spell_slots_max
 
 
 def update_conditions_and_effects(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
@@ -184,8 +192,8 @@ def update_conditions_and_effects(saved: SavedCharacter, effective: EffectiveCha
     conditions = state.get("conditions", [])
     active_effects = state.get("active_effects", [])
 
-    effective.combat["conditions"] = list(conditions)
-    effective.combat["active_effects"] = list(active_effects)
+    effective.conditions = list(conditions)
+    effective.active_effects = list(active_effects)
 
 
 def standard_updates(character: SavedCharacter) -> list[Rule]:
@@ -246,12 +254,14 @@ def collect_updates(character: SavedCharacter) -> list[Rule]:
     return updates
 
 
+def get_active_sources(character: SavedCharacter) -> list[Any]:
+    return character.active_sources()
+
+
 def calculate(character: SavedCharacter) -> EffectiveCharacter:
     effective = create_effective_character(character)
 
     for update in collect_updates(character):
-        update.function(character,effective)
+        update.function(character, effective)
 
     return effective
-
-

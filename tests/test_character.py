@@ -10,8 +10,7 @@ from autosheet import (
     SavedCharacter,
     create_effective_character,
     EffectiveCharacter,
-    Update,
-    CalculationContext,
+    Rule,
     BASE,
     MODIFIERS,
     DERIVED,
@@ -77,17 +76,15 @@ def test_update_and_priorities():
     character = load_character(yaml_path)
     effective = create_effective_character(character)
 
-    ctx = CalculationContext(saved=character, effective=effective)
-    
-    def dummy_func(context: CalculationContext):
-        context.effective.abilities.constitution = 19
+    def dummy_func(saved: SavedCharacter, eff: EffectiveCharacter):
+        eff.abilities.constitution = 19
 
-    update = Update(priority=BASE, source="Test Source", function=dummy_func)
-    assert update.priority == BASE
-    assert update.source == "Test Source"
-    
-    update.function(ctx)
-    assert ctx.effective.abilities.constitution == 19
+    rule = Rule(priority=BASE, source="Test Source", function=dummy_func)
+    assert rule.priority == BASE
+    assert rule.source == "Test Source"
+
+    rule.function(character, effective)
+    assert effective.abilities.constitution == 19
 
 
 def test_rule_registries_and_amulet():
@@ -122,10 +119,10 @@ def test_collect_updates_and_calculate():
     effective = calculate(character)
     # Constitution should be 19 due to Amulet of Health, modifier +4
     assert effective.abilities.constitution == 19
-    assert effective.abilities.constitution_modifier == +4
+    assert effective.ability_modifiers.constitution == +4
     # Dexterity should remain 17 (base), modifier +3
     assert effective.abilities.dexterity == 17
-    assert effective.abilities.dexterity_modifier == +3
+    assert effective.ability_modifiers.dexterity == +3
 
 
 def test_combat_statistics():
@@ -133,9 +130,9 @@ def test_combat_statistics():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    assert effective.combat.get("proficiency_bonus") == 3
-    assert effective.combat.get("initiative") == 3
-    assert effective.combat.get("ac") == 18
+    assert effective.proficiency_bonus == 3
+    assert effective.initiative == 3
+    assert effective.armor_class == 18
 
 
 def test_saving_throws_and_skills():
@@ -143,12 +140,12 @@ def test_saving_throws_and_skills():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    saves = effective.combat.get("saving_throws", {})
+    saves = effective.saving_throws
     assert saves.get("wisdom") == 5     # +2 mod + 3 pb
     assert saves.get("charisma") == 7   # +4 mod + 3 pb
     assert saves.get("strength") == -1  # -1 mod
 
-    skills = effective.combat.get("skill_bonuses", {})
+    skills = effective.skills
     assert skills.get("religion") == 4  # Intelligence +1 + 3 pb
     assert skills.get("insight") == 5   # Wisdom +2 + 3 pb
     assert skills.get("acrobatics") == 3 # Dexterity +3 (not proficient)
@@ -159,8 +156,8 @@ def test_hp_and_hit_dice():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    assert effective.combat.get("hit_point_max") == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
-    assert effective.combat.get("hit_dice") == {"d8": 6}
+    assert effective.hit_points.max == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
+    assert effective.hit_dice == {"d8": 6}
 
 
 def test_spell_slots_and_resources():
@@ -168,7 +165,7 @@ def test_spell_slots_and_resources():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    assert effective.combat.get("spell_slots_max") == {"3": 2}
+    assert effective.spell_slots_max == {"3": 2}
 
 
 def test_registries_and_features():
@@ -180,10 +177,10 @@ def test_registries_and_features():
     assert len(sources) == 9
 
     effective = calculate(character)
-    assert "agonizing_blast" in effective.features
-    assert "repelling_blast" in effective.features
-    assert "eldritch_mind" in effective.features
-    assert "devils_sight" in effective.features
+    assert "Agonizing Blast" in effective.features
+    assert "Repelling Blast" in effective.features
+    assert "Eldritch Mind" in effective.features
+    assert "Devil's Sight" in effective.features
 
 
 def test_conditions_and_effects():
@@ -193,8 +190,8 @@ def test_conditions_and_effects():
     character.state["active_effects"] = [{"id": "hex", "duration_remaining": 47}]
     
     effective = calculate(character)
-    assert effective.combat.get("conditions") == ["poisoned"]
-    assert effective.combat.get("active_effects") == [{"id": "hex", "duration_remaining": 47}]
+    assert effective.conditions == ["poisoned"]
+    assert effective.active_effects == [{"id": "hex", "duration_remaining": 47}]
 
 
 def test_actions_and_saving(tmp_path):
@@ -209,7 +206,7 @@ def test_actions_and_saving(tmp_path):
     unequip_item(character, "amulet_of_health")
     effective_unequipped = calculate(character)
     assert effective_unequipped.abilities.constitution == 16  # Base CON
-    assert effective_unequipped.abilities.constitution_modifier == 3
+    assert effective_unequipped.ability_modifiers.constitution == 3
 
     # Save character to temp file and reload
     temp_yaml = tmp_path / "Northstar_saved.yaml"

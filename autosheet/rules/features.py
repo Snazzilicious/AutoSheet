@@ -1,4 +1,4 @@
-from autosheet.core import Rule, FINAL
+from autosheet.core import Rule, SavedCharacter, EffectiveCharacter, FINAL
 
 
 class Feature(Rule):
@@ -9,10 +9,10 @@ class Feature(Rule):
     """
     priority = FINAL
 
-    def __init__( self ):
-        super().__init__( priority=self.priority, source=self.name, function=self.add_to_character )
+    def __init__(self):
+        super().__init__(priority=self.priority, source=self.name, function=self.add_to_character)
     
-    def add_to_character( self, saved: SavedCharacter, effective: EffectiveCharacter ) -> None:
+    def add_to_character(self, saved: SavedCharacter, effective: EffectiveCharacter) -> None:
         effective.features.add(self.name)
 
 
@@ -35,5 +35,3 @@ FEATURES = {
     "eldritch_mind": EldritchMind,
     "devils_sight": DevilsSight,
 }
-
-

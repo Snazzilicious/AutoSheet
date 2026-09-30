@@ -41,8 +41,10 @@ class SavedCharacter:
         # Classes and Subclasses
         for class_data in self.classes:
             class_name = class_data.get("name")
+            subclass_name = class_data.get("subclass")
+            level = class_data.get("level", 1)
             if class_name in CLASSES:
-                sources.append(CLASSES[class_name](class_data['level'],class_data['subclass']))
+                sources.append(CLASSES[class_name](level, subclass_name))
             else:
                 print(f"Unknown class: {class_name}")
 
@@ -64,10 +66,7 @@ class SavedCharacter:
 
 
 @dataclass
-class Abilities:
-    """
-    Ability scores and their calculated modifiers.
-    """
+class AbilityScores:
     strength: int = 0
     dexterity: int = 0
     constitution: int = 0
@@ -75,29 +74,48 @@ class Abilities:
     wisdom: int = 0
     charisma: int = 0
 
-    strength_modifier: int = 0
-    dexterity_modifier: int = 0
-    constitution_modifier: int = 0
-    intelligence_modifier: int = 0
-    wisdom_modifier: int = 0
-    charisma_modifier: int = 0
+
+@dataclass
+class AbilityModifiers:
+    strength: int = 0
+    dexterity: int = 0
+    constitution: int = 0
+    intelligence: int = 0
+    wisdom: int = 0
+    charisma: int = 0
+
+
+@dataclass
+class HitPoints:
+    max: int = 0
+    current: int = 0
+    temporary: int = 0
 
 
 @dataclass
 class EffectiveCharacter:
     """
-    Temporary calculated representation of a character.
-    This object is to be displayed to the player.
+    Calculated representation of a character mapped directly to display and YAML output.
     """
-    abilities: Abilities
-    skills: Skills
-    saving_throws: SavingThrows
-    armor_class: int
+    name: str = ""
+    level: int = 0
+    proficiency_bonus: int = 2
+    armor_class: int = 10
+    initiative: int = 0
     
-    proficiencies: dict[str, Any] = field(default_factory=dict)
-    combat: dict[str, Any] = field(default_factory=dict)
-    spells: dict[str, Any] = field(default_factory=dict)
+    hit_points: HitPoints = field(default_factory=HitPoints)
+    hit_dice: dict[str, int] = field(default_factory=dict)
+    
+    abilities: AbilityScores = field(default_factory=AbilityScores)
+    ability_modifiers: AbilityModifiers = field(default_factory=AbilityModifiers)
+    
+    saving_throws: dict[str, int] = field(default_factory=dict)
+    skills: dict[str, int] = field(default_factory=dict)
+    spell_slots_max: dict[str, int] = field(default_factory=dict)
+    
     features: set[str] = field(default_factory=set)
+    conditions: list[str] = field(default_factory=list)
+    active_effects: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
