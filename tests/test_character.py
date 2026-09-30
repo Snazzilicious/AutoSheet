@@ -18,6 +18,7 @@ from autosheet import (
     get_active_sources,
     calculate,
     save_character,
+    save_character_with_effective,
     equip_item,
     unequip_item,
     cast_spell,
@@ -224,3 +225,23 @@ def test_actions_and_saving(tmp_path):
     assert character.state["hp"]["current"] == 57  # Max HP
     assert character.state["spell_slots"]["3"] == 2  # Restored
     assert character.state["conditions"] == []
+
+
+def test_save_character_with_effective(tmp_path):
+    yaml_path = Path(__file__).parent.parent / "characters" / "Northstar.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+
+    out_path = tmp_path / "Northstar_effective.yaml"
+    save_character_with_effective(character, effective, out_path)
+
+    import yaml
+    with out_path.open("r", encoding="utf-8") as f:
+        docs = list(yaml.safe_load_all(f))
+
+    assert len(docs) == 2
+    assert docs[0]["name"] == "Northstar"
+    assert docs[1]["name"] == "Northstar"
+    assert docs[1]["armor_class"] == 18
+    assert docs[1]["ability_modifiers"]["constitution"] == 4
+

@@ -148,6 +148,61 @@ def save_character(character: SavedCharacter, path: str | Path) -> None:
         yaml.safe_dump(data, file, sort_keys=False)
 
 
+def save_character_with_effective(character: SavedCharacter, effective: EffectiveCharacter, path: str | Path) -> None:
+    """
+    Save both the saved character and calculated effective character as a multi-document YAML file.
+    """
+    path = Path(path)
+    saved_data = {
+        "name": character.name,
+        "classes": character.classes,
+        "abilities": character.abilities,
+        "proficiencies": character.proficiencies,
+        "inventory": character.inventory,
+        "equipment": character.equipment,
+        "features": character.features,
+        "spells": character.spells,
+        "state": character.state,
+    }
+    effective_data = {
+        "name": effective.name,
+        "level": effective.level,
+        "proficiency_bonus": effective.proficiency_bonus,
+        "armor_class": effective.armor_class,
+        "initiative": effective.initiative,
+        "hit_points": {
+            "max": effective.hit_points.max,
+            "current": effective.hit_points.current,
+            "temporary": effective.hit_points.temporary,
+        },
+        "hit_dice": effective.hit_dice,
+        "abilities": {
+            "strength": effective.abilities.strength,
+            "dexterity": effective.abilities.dexterity,
+            "constitution": effective.abilities.constitution,
+            "intelligence": effective.abilities.intelligence,
+            "wisdom": effective.abilities.wisdom,
+            "charisma": effective.abilities.charisma,
+        },
+        "ability_modifiers": {
+            "strength": effective.ability_modifiers.strength,
+            "dexterity": effective.ability_modifiers.dexterity,
+            "constitution": effective.ability_modifiers.constitution,
+            "intelligence": effective.ability_modifiers.intelligence,
+            "wisdom": effective.ability_modifiers.wisdom,
+            "charisma": effective.ability_modifiers.charisma,
+        },
+        "saving_throws": effective.saving_throws,
+        "skills": effective.skills,
+        "spell_slots_max": effective.spell_slots_max,
+        "features": sorted(list(effective.features)),
+        "conditions": effective.conditions,
+        "active_effects": effective.active_effects,
+    }
+    with path.open("w", encoding="utf-8") as file:
+        yaml.safe_dump_all([saved_data, effective_data], file, sort_keys=False)
+
+
 def load_character(path: str | Path) -> SavedCharacter:
     """
     Load a character from a YAML file.
