@@ -245,9 +245,7 @@ def collect_updates(character: SavedCharacter) -> list[Rule]:
     updates = []
 
     updates.extend(standard_updates(character))
-
-    for source in character.active_sources():
-        updates.extend(source.get_updates())
+    updates.extend(character.active_sources())
 
     updates.sort(key=lambda update: update.priority)
 

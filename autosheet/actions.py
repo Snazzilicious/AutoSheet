@@ -42,11 +42,11 @@ def long_rest(character: SavedCharacter) -> None:
     Perform a long rest, restoring HP to max, resetting spell slots, and clearing conditions.
     """
     effective = calculate(character)
-    max_hp = effective.combat.get("hit_point_max", 0)
+    max_hp = effective.hit_points.max
     character.state.setdefault("hp", {})["current"] = max_hp
     character.state["hp"]["temporary"] = 0
 
-    max_slots = effective.combat.get("spell_slots_max", {})
+    max_slots = effective.spell_slots_max
     character.state["spell_slots"] = dict(max_slots)
 
     character.state["conditions"] = []

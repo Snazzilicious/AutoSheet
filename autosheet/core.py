@@ -58,7 +58,7 @@ class SavedCharacter:
         # Equipped items
         for item_id in self.equipment:
             if item_id in ITEMS:
-                sources.append(ITEMS[item_id]())
+                sources.append(ITEMS[item_id](equipped=True))
             else:
                 print(f"Unknown item: {item_id}")
 

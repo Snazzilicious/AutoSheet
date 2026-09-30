@@ -17,7 +17,7 @@ class CharacterClass(Rule):
 
 
 class Warlock(CharacterClass):
-    self.name = "Warlock"
+    name = "Warlock"
 
 
 CLASSES = {"Warlock": Warlock}

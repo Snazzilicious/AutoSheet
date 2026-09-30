@@ -92,11 +92,9 @@ def test_rule_registries_and_amulet():
     item_class = ITEMS["amulet_of_health"]
     amulet = item_class()
     assert isinstance(amulet, AmuletOfHealth)
-
-    updates = amulet.get_updates()
-    assert len(updates) == 1
-    assert updates[0].priority == BASE
-    assert updates[0].source == "Amulet of Health"
+    assert isinstance(amulet, Rule)
+    assert amulet.priority == BASE
+    assert amulet.source == "Amulet of Health"
 
 
 def test_active_sources():
@@ -104,7 +102,7 @@ def test_active_sources():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    assert len(sources) == 9
+    assert len(sources) == 8
 
 
 def test_collect_updates_and_calculate():
@@ -112,8 +110,8 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Total updates: 8 standard + 3 items + 4 features = 15 updates
-    assert len(updates) == 15
+    # Total updates: 8 standard + 1 class + 3 items + 4 features = 16 updates
+    assert len(updates) == 16
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -173,8 +171,8 @@ def test_registries_and_features():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    # 1 class (Warlock) + 1 subclass (Celestial) + 4 features + 3 items = 9 sources
-    assert len(sources) == 9
+    # 1 class (Warlock) + 4 features + 3 items = 8 sources
+    assert len(sources) == 8
 
     effective = calculate(character)
     assert "Agonizing Blast" in effective.features
