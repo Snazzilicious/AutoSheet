@@ -103,6 +103,7 @@ class EffectiveCharacter:
     proficiency_bonus: int = 2
     armor_class: int = 10
     initiative: int = 0
+    passive_perception: int = 10
     
     hit_points: HitPoints = field(default_factory=HitPoints)
     hit_dice: dict[str, int] = field(default_factory=dict)
@@ -165,6 +166,7 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
         "proficiency_bonus": effective.proficiency_bonus,
         "armor_class": effective.armor_class,
         "initiative": effective.initiative,
+        "passive_perception": effective.passive_perception,
         "hit_points": {
             "max": effective.hit_points.max,
             "current": effective.hit_points.current,

@@ -90,6 +90,7 @@ level: 7
 proficiency_bonus: 3
 armor_class: 18
 initiative: 3
+passive_perception: 12
 hit_points:
   max: 74
   current: 37

@@ -9,7 +9,6 @@
     10. add race to base
     11. speed
     12. Spell DC (per class)
-    13. passive perception
     14. handle case sensitivity
         1. and maybe spaces too
     3. add exp

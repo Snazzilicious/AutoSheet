@@ -117,6 +117,7 @@ def update_skills(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
         skill_bonuses[skill] = mod + (mult * pb)
 
     effective.skills = skill_bonuses
+    effective.passive_perception = 10 + skill_bonuses.get("perception", 0)
 
 
 from autosheet.rules.classes import CLASS_HIT_DIE

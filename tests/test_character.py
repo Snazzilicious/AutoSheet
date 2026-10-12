@@ -264,4 +264,13 @@ def test_hp_rolls():
     assert effective.hit_points.max == 72
 
 
+def test_passive_perception():
+    yaml_path = Path(__file__).parent.parent / "characters" / "test_character.yaml"
+    character = load_character(yaml_path)
+    effective = calculate(character)
+    # Wisdom 14 -> mod +2. Perception not proficient -> bonus +2 -> passive perception = 10 + 2 = 12
+    assert effective.passive_perception == 12
+
+
+
 

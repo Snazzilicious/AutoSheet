@@ -30,6 +30,9 @@ class SpellSlot(Resource):
         self.name = f"Spell slot lvl {level:1d}"
         super().__init__(max_uses, remaining_uses)
 
+class WarlockSpellSlot(SpellSlot):
+    recharge_event = "Short Rest"
+
 class HitDie(Resource):
     recharge_event = "Long Rest"
 
