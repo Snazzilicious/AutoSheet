@@ -1,7 +1,6 @@
 
 
 0. Misc
-    2. make hit die a state resource
     3. add exp
     4. update max hp calculation to take list of rolled values
     5. change inspiration to int

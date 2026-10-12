@@ -74,6 +74,8 @@ state:
   conditions: []
   concentration: null
   inspiration: false
+  hit_dice:
+    d8: 6
 ---
 name: Northstar
 level: 6

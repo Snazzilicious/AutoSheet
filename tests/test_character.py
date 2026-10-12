@@ -26,6 +26,7 @@ from autosheet import (
     long_rest,
 )
 from autosheet.rules import ITEMS, AmuletOfHealth
+from autosheet.rules.resources import HitDie
 from autosheet.calculation import collect_updates
 
 
@@ -156,7 +157,10 @@ def test_hp_and_hit_dice():
     effective = calculate(character)
 
     assert effective.hit_points.max == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
-    assert effective.hit_dice == {"d8": 6}
+    assert "d8" in effective.hit_dice
+    assert isinstance(effective.hit_dice["d8"], HitDie)
+    assert effective.hit_dice["d8"].max_uses == 6
+    assert effective.hit_dice["d8"].remaining_uses == 6
 
 
 def test_spell_slots_and_resources():

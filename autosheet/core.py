@@ -174,7 +174,10 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
             "current": effective.hit_points.current,
             "temporary": effective.hit_points.temporary,
         },
-        "hit_dice": effective.hit_dice,
+        "hit_dice": {
+            k: (v.max_uses if hasattr(v, "max_uses") else v)
+            for k, v in effective.hit_dice.items()
+        },
         "abilities": {
             "strength": effective.abilities.strength,
             "dexterity": effective.abilities.dexterity,

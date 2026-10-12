@@ -119,29 +119,15 @@ def update_skills(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     effective.skills = skill_bonuses
 
 
-CLASS_HIT_DIE = {
-    "barbarian": 12,
-    "fighter": 10,
-    "paladin": 10,
-    "ranger": 10,
-    "bard": 8,
-    "cleric": 8,
-    "druid": 8,
-    "monk": 8,
-    "rogue": 8,
-    "warlock": 8,
-    "sorcerer": 6,
-    "wizard": 6,
-}
+from autosheet.rules.classes import CLASS_HIT_DIE
 
 
 def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
     """
-    Calculate maximum hit points and hit dice.
+    Calculate maximum hit points.
     """
     con_mod = effective.ability_modifiers.constitution
     total_hp = 0
-    hit_dice = {}
 
     first_level = True
     for class_data in saved.classes:
@@ -159,12 +145,8 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
         first_level = False
         total_hp += class_hp
 
-        die_key = f"d{die}"
-        hit_dice[die_key] = hit_dice.get(die_key, 0) + level
-
     effective.hit_points.max = total_hp
     effective.hit_points.current = saved.state.get("hp", {}).get("current", total_hp)
-    effective.hit_dice = hit_dice
 
 
 def update_spell_slots_and_resources(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
