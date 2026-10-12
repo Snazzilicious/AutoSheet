@@ -1,7 +1,6 @@
 
 
 0. Misc
-    1. consider removing active_effects in favor of just features & conditions
     2. make hit die a state resource
     3. add exp
     4. update max hp calculation to take list of rolled values
@@ -16,8 +15,6 @@
     13. passive perception
     14. handle case sensitivity
         1. and maybe spaces too
-    15. load from display document
-    16. base Con is 14
     17. alignment
     18. languages
     19. background
