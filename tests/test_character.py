@@ -245,3 +245,9 @@ def test_save_character_with_effective(tmp_path):
     assert docs[1]["armor_class"] == 18
     assert docs[1]["ability_modifiers"]["constitution"] == 4
 
+    # Test loading multi-document file back with load_character
+    reloaded_char = load_character(out_path)
+    assert reloaded_char.name == "Northstar"
+    assert reloaded_char.abilities["constitution"] == 16
+
+

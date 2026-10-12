@@ -1,4 +1,4 @@
-from autosheet.core import Rule, SavedCharacter, EffectiveCharacter, FINAL
+from autosheet.core import Rule, SavedCharacter, EffectiveCharacter, FINAL, DERIVED
 
 
 class Feature(Rule):

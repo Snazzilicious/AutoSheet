@@ -148,11 +148,10 @@ def save_character(character: SavedCharacter, path: str | Path) -> None:
         yaml.safe_dump(data, file, sort_keys=False)
 
 
-def save_character_with_effective(character: SavedCharacter, effective: EffectiveCharacter, path: str | Path) -> None:
+def save_character_with_effective(character: SavedCharacter, effective: EffectiveCharacter, path: str | Path | Any) -> None:
     """
-    Save both the saved character and calculated effective character as a multi-document YAML file.
+    Save both the saved character and calculated effective character as a multi-document YAML file or stream.
     """
-    path = Path(path)
     saved_data = {
         "name": character.name,
         "classes": character.classes,
@@ -199,8 +198,12 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
         "conditions": effective.conditions,
         "active_effects": effective.active_effects,
     }
-    with path.open("w", encoding="utf-8") as file:
-        yaml.safe_dump_all([saved_data, effective_data], file, sort_keys=False)
+    if hasattr(path, "write"):
+        yaml.safe_dump_all([saved_data, effective_data], path, sort_keys=False)
+    else:
+        path = Path(path)
+        with path.open("w", encoding="utf-8") as file:
+            yaml.safe_dump_all([saved_data, effective_data], file, sort_keys=False)
 
 
 def load_character(path: str | Path) -> SavedCharacter:
@@ -210,10 +213,12 @@ def load_character(path: str | Path) -> SavedCharacter:
     path = Path(path)
 
     with path.open("r", encoding="utf-8") as file:
-        data = yaml.safe_load(file)
+        documents = list(yaml.safe_load_all(file))
 
-    if not isinstance(data, dict):
+    if not documents or not isinstance(documents[0], dict):
         raise ValueError(f"Character file must contain a YAML mapping: {path}")
+
+    data = documents[0]
 
     return SavedCharacter(
         name=data.get("name", ""),
