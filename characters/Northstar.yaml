@@ -1,7 +1,15 @@
 name: Northstar
+hp_rolls:
+- 8
+- 7
+- 7
+- 8
+- 5
+- 3
+- 8
 classes:
 - name: Warlock
-  level: 6
+  level: 7
   subclass: Celestial
 abilities:
   strength: 8
@@ -78,16 +86,16 @@ state:
     d8: 6
 ---
 name: Northstar
-level: 6
+level: 7
 proficiency_bonus: 3
 armor_class: 18
 initiative: 3
 hit_points:
-  max: 57
+  max: 74
   current: 37
   temporary: 0
 hit_dice:
-  d8: 6
+  d8: 7
 abilities:
   strength: 8
   dexterity: 17
@@ -129,7 +137,7 @@ skills:
   performance: 4
   persuasion: 4
 spell_slots_max:
-  '3': 2
+  '4': 2
 features:
 - Agonizing Blast
 - Devil's Sight

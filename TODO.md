@@ -2,7 +2,6 @@
 
 0. Misc
     3. add exp
-    4. update max hp calculation to take list of rolled values
     5. change inspiration to int
     6. Add attacks
     7. add spells

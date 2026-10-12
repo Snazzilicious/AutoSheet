@@ -128,7 +128,9 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
     """
     con_mod = effective.ability_modifiers.constitution
     total_hp = 0
+    hp_rolls = saved.hp_rolls
 
+    level_idx = 0
     first_level = True
     for class_data in saved.classes:
         class_name = class_data.get("name", "").lower()
@@ -138,10 +140,15 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
 
         class_hp = 0
         for lvl in range(1, level + 1):
-            if first_level and lvl == 1:
-                class_hp += max(1, die + con_mod)
+            if level_idx < len(hp_rolls):
+                roll = hp_rolls[level_idx]
+                class_hp += max(1, roll + con_mod)
             else:
-                class_hp += max(1, die_avg + con_mod)
+                if first_level and lvl == 1:
+                    class_hp += max(1, die + con_mod)
+                else:
+                    class_hp += max(1, die_avg + con_mod)
+            level_idx += 1
         first_level = False
         total_hp += class_hp
 

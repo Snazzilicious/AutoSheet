@@ -255,3 +255,13 @@ def test_save_character_with_effective(tmp_path):
     assert reloaded_char.abilities["constitution"] == 16
 
 
+def test_hp_rolls():
+    yaml_path = Path(__file__).parent.parent / "characters" / "test_character.yaml"
+    character = load_character(yaml_path)
+    character.hp_rolls = [8, 8, 8, 8, 8, 8]
+    effective = calculate(character)
+    # 6 levels with roll 8 + CON mod 4 = 12 each -> total 72 HP
+    assert effective.hit_points.max == 72
+
+
+

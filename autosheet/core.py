@@ -21,14 +21,15 @@ class SavedCharacter:
     the character file. Derived values belong in EffectiveCharacter.
     """
     name: str
-    classes: list[dict[str, Any]]
-    abilities: dict[str, Any]
-    proficiencies: dict[str, Any]
-    inventory: dict[str, Any]
-    equipment: dict[str, Any]
-    features: list[str]
-    spells: dict[str, Any]
-    state: dict[str, Any]
+    hp_rolls: list[int] = field(default_factory=list)
+    classes: list[dict[str, Any]] = field(default_factory=list)
+    abilities: dict[str, Any] = field(default_factory=dict)
+    proficiencies: dict[str, Any] = field(default_factory=dict)
+    inventory: dict[str, Any] = field(default_factory=dict)
+    equipment: dict[str, Any] = field(default_factory=dict)
+    features: list[str] = field(default_factory=list)
+    spells: dict[str, Any] = field(default_factory=dict)
+    state: dict[str, Any] = field(default_factory=dict)
 
     def active_sources(self) -> list[Any]:
         """
@@ -135,6 +136,7 @@ def save_character(character: SavedCharacter, path: str | Path) -> None:
     path = Path(path)
     data = {
         "name": character.name,
+        "hp_rolls": character.hp_rolls,
         "classes": character.classes,
         "abilities": character.abilities,
         "proficiencies": character.proficiencies,
@@ -154,6 +156,7 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
     """
     saved_data = {
         "name": character.name,
+        "hp_rolls": character.hp_rolls,
         "classes": character.classes,
         "abilities": character.abilities,
         "proficiencies": character.proficiencies,
@@ -225,6 +228,7 @@ def load_character(path: str | Path) -> SavedCharacter:
 
     return SavedCharacter(
         name=data.get("name", ""),
+        hp_rolls=data.get("hp_rolls", []),
         classes=data.get("classes", []),
         abilities=data.get("abilities", {}),
         proficiencies=data.get("proficiencies", {}),
