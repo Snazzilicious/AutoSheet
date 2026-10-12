@@ -1,18 +1,18 @@
 
 
 0. Misc
-    3. add exp
-    5. change inspiration to int
     6. Add attacks
     7. add spells
     8. add other actions
+    9. update resource print outs to be remaining / max
     9. Don't add duplicate values e.g. class, race
     10. add race to base
     11. speed
-    12. Spell DC
+    12. Spell DC (per class)
     13. passive perception
     14. handle case sensitivity
         1. and maybe spaces too
+    3. add exp
     17. alignment
     18. languages
     19. background
@@ -25,7 +25,6 @@
 2. Create all Rules
     1. Class
         1. move spell slots and resources and class-specific features to class
-    2. Resource (mainly for recharge mechanism)
 3. Design and Add character actions
 4. Add descriptions
 

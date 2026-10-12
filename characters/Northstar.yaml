@@ -81,7 +81,7 @@ state:
     failures: 0
   conditions: []
   concentration: null
-  inspiration: false
+  inspiration: 1
   hit_dice:
     d8: 6
 ---

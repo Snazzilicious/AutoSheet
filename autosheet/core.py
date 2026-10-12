@@ -129,12 +129,8 @@ class Rule:
     function: Callable[[SavedCharacter,EffectiveCharacter], None]
 
 
-def save_character(character: SavedCharacter, path: str | Path) -> None:
-    """
-    Save character state to a YAML file.
-    """
-    path = Path(path)
-    data = {
+def _saved_character_dict(character: SavedCharacter) -> dict[str, Any]:
+    return {
         "name": character.name,
         "hp_rolls": character.hp_rolls,
         "classes": character.classes,
@@ -146,6 +142,14 @@ def save_character(character: SavedCharacter, path: str | Path) -> None:
         "spells": character.spells,
         "state": character.state,
     }
+
+
+def save_character(character: SavedCharacter, path: str | Path) -> None:
+    """
+    Save character state to a YAML file.
+    """
+    path = Path(path)
+    data = _saved_character_dict(character)
     with path.open("w", encoding="utf-8") as file:
         yaml.safe_dump(data, file, sort_keys=False)
 
@@ -154,18 +158,7 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
     """
     Save both the saved character and calculated effective character as a multi-document YAML file or stream.
     """
-    saved_data = {
-        "name": character.name,
-        "hp_rolls": character.hp_rolls,
-        "classes": character.classes,
-        "abilities": character.abilities,
-        "proficiencies": character.proficiencies,
-        "inventory": character.inventory,
-        "equipment": character.equipment,
-        "features": character.features,
-        "spells": character.spells,
-        "state": character.state,
-    }
+    saved_data = _saved_character_dict(character)
     effective_data = {
         "name": effective.name,
         "level": effective.level,
