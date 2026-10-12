@@ -62,7 +62,7 @@ The project structure is organized as:
 ```text
 autosheet/
 ├── characters/
-│   └── Northstar.yaml
+│   └── test_character.yaml
 ├── autosheet/
 │   ├── __init__.py
 │   ├── core.py
