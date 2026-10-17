@@ -66,6 +66,13 @@ class SavedCharacter:
         return sources
 
 
+
+@dataclass
+class HitPoints:
+    max: int = 0
+    current: int = 0
+    temporary: int = 0
+
 @dataclass
 class AbilityScores:
     strength: int = 0
@@ -74,7 +81,6 @@ class AbilityScores:
     intelligence: int = 0
     wisdom: int = 0
     charisma: int = 0
-
 
 @dataclass
 class AbilityModifiers:
@@ -85,12 +91,97 @@ class AbilityModifiers:
     wisdom: int = 0
     charisma: int = 0
 
+@dataclass
+class SavingThrows:
+    strength: int = 0
+    dexterity: int = 0
+    constitution: int = 0
+    intelligence: int = 0
+    wisdom: int = 0
+    charisma: int = 0
 
 @dataclass
-class HitPoints:
-    max: int = 0
-    current: int = 0
-    temporary: int = 0
+class Skills:
+    athletics: int = 0
+    acrobatics: int = 0
+    sleight_of_hand: int = 0
+    stealth: int = 0
+    arcana: int = 0
+    history: int = 0
+    investigation: int = 0
+    nature: int = 0
+    religion: int = 0
+    animal_handling: int = 0
+    insight: int = 0
+    medicine: int = 0
+    perception: int = 0
+    survival: int = 0
+    deception: int = 0
+    intimidation: int = 0
+    performance: int = 0
+    persuasion: int = 0
+
+@dataclass
+class Feature:
+    """
+    An entry in EffectiveCharacter's feature list
+    Has a short name for display
+    Provides a description of the feature
+    """
+    name: str = ""
+    description: str = ""
+
+class Resource:
+    """
+    Rechargable consumable required to use abilities.
+    """
+    def __init__(self, name, max_uses: int, remaining_uses: int = -1, recharge_event = None):
+        self.name = name
+        self.max_uses = max_uses
+        self.remaining_uses = remaining_uses
+        if self.remaining_uses < 0:
+            self.remaining_uses = max_uses
+        self.recharge_event = recharge_event
+
+    def recharge(self, recharge_event=None):
+        if recharge_event is None or recharge_event == self.recharge_event:
+            self.remaining_uses = self.max_uses
+    
+    def use(self,n_uses=1):
+        self.remaining_uses -= n_uses
+        self.remaining_uses = max(0, self.remaining_uses)
+    
+    def __str__(self):
+        return f"{self.name:<20s}:{self.remaining_uses:<2d} / {self.max_uses:<2d}"
+
+@dataclass
+class CharacterAction:
+    """
+    An entry in the EffectiveCharacter's action list
+    Has a short name for display
+    Provides a description of the action
+    Includes 'cost'
+    """
+    name: str
+    cost: str = "Action"
+    description: str = ""
+
+class Attack(CharacterAction):
+    
+    def __init__(self,name,range,atk_bonus,dmg_die,dmg_mod,dmg_type,cost="Action"):
+
+        description = f"Range {self.range}, +{self.bonus} to hit, {self.dmg}+{self.mod} {dmg_type} damage"
+
+        super().__init__( name, description, cost )
+
+class Spell(CharacterAction):
+    
+    def __init__(self,name,range,atk_bonus,dmg_die,dmg_mod,dmg_type,level,duration,concentration):
+
+        description = f"Range {self.range}, +{self.bonus} to hit, {self.dmg}+{self.mod} {dmg_type} damage"
+
+        super().__init__( name, description, "Action" )
+
 
 
 @dataclass
@@ -106,18 +197,21 @@ class EffectiveCharacter:
     passive_perception: int = 10
     
     hit_points: HitPoints = field(default_factory=HitPoints)
-    hit_dice: dict[str, int] = field(default_factory=dict)
     
     abilities: AbilityScores = field(default_factory=AbilityScores)
     ability_modifiers: AbilityModifiers = field(default_factory=AbilityModifiers)
     
     saving_throws: dict[str, int] = field(default_factory=dict)
     skills: dict[str, int] = field(default_factory=dict)
-    spell_slots_max: dict[str, int] = field(default_factory=dict)
+
+    features: dict[str, Feature] = field(default_factory=dict)
+    resources: dict[str, Resource] = field(default_factory=dict) # move hit dice, spell_slots in here
+    actions: dict[str, CharacterAction] = field(default_factory=dict)
+    attacks: dict[str, Attack] = field(default_factory=dict)
+    spells: dict[str, Spell] = field(default_factory=dict)
     
-    features: set[str] = field(default_factory=set)
-    conditions: list[str] = field(default_factory=list)
-    active_effects: list[dict[str, Any]] = field(default_factory=list)
+    # conditions: list[str] = field(default_factory=list)
+    # active_effects: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -234,3 +328,18 @@ def load_character(path: str | Path) -> SavedCharacter:
         state=data.get("state", {}),
     )
 
+
+
+# @dataclass
+# class CharacterAction(Rule):
+#     """
+#     An entry in the EffectiveCharacter's action list
+#     Has a short name for display
+#     Provides a description of the action
+#     Includes 'cost'
+#     """
+#     name: str
+#     brief: str
+#     cost: str
+#     description: str = ""
+#     # add self to actions list

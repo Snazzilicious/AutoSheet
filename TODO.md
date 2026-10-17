@@ -1,11 +1,18 @@
 
 
 0. Misc
+    1. Finish spec'ing EffectiveCharacter
+        1. move all base classes to core
+        2. Make all of effective's fields classes
+            1. opens door for using actions and resetting resources etc
+        3. add resources to SavedCharacter's state
+    2. Spells and items don't need to know if they are active
     6. Add attacks
     7. add spells
     8. add other actions
     9. update resource print outs to be remaining / max
     9. Don't add duplicate values e.g. class, race
+        1. actually it would be nice if effective character was self sufficient
     10. add race to base
     11. speed
     12. Spell DC (per class)
