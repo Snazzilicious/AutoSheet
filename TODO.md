@@ -1,6 +1,4 @@
 0. Misc
-    1. Spells should not have atk printout if not attack
-        1. atk spells should maybe be under attacks ???
     2. Add type to resource display. 'd8' should be 'hit die: d8' or something etc
     3. add resources to SavedCharacter's state
     4. update resource print outs to be remaining / max

@@ -113,8 +113,8 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Total updates: 8 standard + 1 class + 3 items + 4 features + 2 spells = 18 updates
-    assert len(updates) == 18
+    # Total updates: 7 standard + 1 class + 3 items + 4 features + 2 spells = 17 updates
+    assert len(updates) == 17
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -232,6 +232,12 @@ def test_actions_and_saving(tmp_path):
     assert character.state["hp"]["current"] == 57  # Max HP
     assert character.state["spell_slots"]["3"] == 2  # Restored
     assert character.state["conditions"] == []
+
+    # Short rest test for Warlock spell slots
+    assert cast_spell(character, 3) is True
+    assert character.state["spell_slots"]["3"] == 1
+    short_rest(character)
+    assert character.state["spell_slots"]["3"] == 2
 
 
 def test_save_character_with_effective(tmp_path):

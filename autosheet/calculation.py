@@ -158,24 +158,7 @@ def update_hp_and_hit_dice(saved: SavedCharacter, effective: EffectiveCharacter)
     effective.hit_points.current = saved.state.get("hp", {}).get("current", total_hp)
 
 
-def update_spell_slots_and_resources(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
-    """
-    Calculate maximum spell slots and resource maximums.
-    """
-    for class_data in saved.classes:
-        class_name = class_data.get("name", "").lower()
-        level = class_data.get("level", 1)
-        if class_name == "warlock":
-            slot_level = min(5, (level + 1) // 2)
-            slot_count = 3 if level >= 11 else (4 if level >= 17 else 2)
-            slot_key = str(slot_level)
-            state_slots = saved.state.get("spell_slots", {})
-            remaining = state_slots.get(slot_key, -1)
-            effective.resources[slot_key] = Resource(
-                name=f"Level {slot_level} Spell Slot",
-                max_uses=slot_count,
-                remaining_uses=remaining
-            )
+
 
 
 def update_conditions_and_effects(saved: SavedCharacter, effective: EffectiveCharacter) -> None:
@@ -221,11 +204,6 @@ def standard_updates(character: SavedCharacter) -> list[Rule]:
             priority=DERIVED,
             source="HP and Hit Dice",
             function=update_hp_and_hit_dice,
-        ),
-        Rule(
-            priority=DERIVED,
-            source="Spell Slots and Resources",
-            function=update_spell_slots_and_resources,
         ),
         Rule(
             priority=DERIVED,

@@ -179,9 +179,48 @@ class Attack(CharacterAction):
         super().__init__(name, cost, description)
 
 class Spell(CharacterAction):
-    def __init__(self, name, range="60 ft", atk_bonus=0, dmg_die="1d8", dmg_mod=0, dmg_type="force", level=1, duration="Instantaneous", concentration=False):
-        description = f"Range {range}, Level {level} spell, +{atk_bonus} to hit, {dmg_die}+{dmg_mod} {dmg_type} damage"
-        super().__init__(name, "Action", description)
+    def __init__(
+        self,
+        name: str,
+        level: int = 1,
+        cost: str = "1 Action",
+        range: str = "60 ft",
+        duration: str = "Instantaneous",
+        concentration: bool = False,
+        atk_bonus: int | None = None,
+        save: str | None = None,
+        dmg_die: str | None = None,
+        dmg_mod: int = 0,
+        dmg_type: str | None = None,
+        school: str = "",
+    ):
+        self.level = level
+        self.school = school
+        self.casting_time = cost
+        self.range = range
+        self.duration = duration
+        self.concentration = concentration
+        
+        parts = []
+        parts.append(f"Level {level}" if level > 0 else "Cantrip")
+        if school:
+            parts.append(school)
+        parts.append(f"Range: {range}")
+        parts.append(f"Casting: {cost}")
+        
+        dur_str = f"Duration: {'Concentration, ' if concentration else ''}{duration}"
+        parts.append(dur_str)
+        
+        if atk_bonus is not None:
+            parts.append(f"+{atk_bonus} to hit")
+        if save:
+            parts.append(f"Save: {save}")
+        if dmg_die and dmg_type:
+            mod_str = f"+{dmg_mod}" if dmg_mod else ""
+            parts.append(f"Damage: {dmg_die}{mod_str} {dmg_type}")
+
+        description = ", ".join(parts)
+        super().__init__(name, cost, description)
 
 
 

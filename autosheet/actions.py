@@ -34,7 +34,12 @@ def short_rest(character: SavedCharacter) -> None:
     """
     Perform a short rest.
     """
-    pass
+    effective = calculate(character)
+    spell_slots = character.state.setdefault("spell_slots", {})
+    for k, v in effective.resources.items():
+        if k.isdigit():
+            v.recharge("Short Rest")
+            spell_slots[k] = v.remaining_uses
 
 
 def long_rest(character: SavedCharacter) -> None:

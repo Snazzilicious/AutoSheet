@@ -152,9 +152,11 @@ attacks: {}
 spells:
   Hex:
     name: Hex
-    cost: Action
-    description: Range 60 ft, Level 1 spell, +0 to hit, 1d8+0 force damage
+    cost: 1 Bonus Action
+    description: 'Level 1, Enchantment, Range: 90 ft, Casting: 1 Bonus Action, Duration:
+      Concentration, 1 hour, Damage: 1d6 necrotic'
   Bless:
     name: Bless
-    cost: Action
-    description: Range 60 ft, Level 1 spell, +0 to hit, 1d8+0 force damage
+    cost: 1 Action
+    description: 'Level 1, Enchantment, Range: 30 ft, Casting: 1 Action, Duration:
+      Concentration, 1 minute'
