@@ -1,5 +1,4 @@
 0. Misc
-    3. add resources to SavedCharacter's state
     5. Don't add duplicate values e.g. class, race
         1. actually it would be nice if effective character was self sufficient
     6. add race to base

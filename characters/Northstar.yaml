@@ -82,8 +82,9 @@ state:
   conditions: []
   concentration: null
   inspiration: 1
-  hit_dice:
-    d8: 6
+  resources:
+    'hit die: d8': 6
+    'spell slot: 4': 1
 ---
 name: Northstar
 level: 7
@@ -101,7 +102,7 @@ resources:
     remaining_uses: 6
   'spell slot: 4':
     max_uses: 2
-    remaining_uses: 2
+    remaining_uses: 1
 abilities:
   strength: 8
   dexterity: 17

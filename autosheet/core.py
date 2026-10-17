@@ -378,17 +378,3 @@ def load_character(path: str | Path) -> SavedCharacter:
     )
 
 
-
-# @dataclass
-# class CharacterAction(Rule):
-#     """
-#     An entry in the EffectiveCharacter's action list
-#     Has a short name for display
-#     Provides a description of the action
-#     Includes 'cost'
-#     """
-#     name: str
-#     brief: str
-#     cost: str
-#     description: str = ""
-#     # add self to actions list

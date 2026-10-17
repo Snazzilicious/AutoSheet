@@ -36,8 +36,7 @@ class CharacterClass(Rule):
         from autosheet.rules.resources import HitDie
         die = self.hit_die
         die_key = f"hit die: d{die}"
-        state_hit_dice = saved.state.get("hit_dice", {})
-        remaining = state_hit_dice.get(f"d{die}", -1)
+        remaining = saved.state.get("resources", {}).get(die_key, -1)
 
         if die_key in effective.resources:
             existing = effective.resources[die_key]
@@ -58,8 +57,7 @@ class Warlock(CharacterClass):
         slot_level = min(5, (self.level + 1) // 2)
         slot_count = 3 if self.level >= 11 else (4 if self.level >= 17 else 2)
         slot_key = f"spell slot: {slot_level}"
-        state_slots = saved.state.get("spell_slots", {})
-        remaining = state_slots.get(str(slot_level), -1)
+        remaining = saved.state.get("resources", {}).get(slot_key, -1)
 
         from autosheet.rules.resources import WarlockSpellSlot
         if slot_key in effective.resources:

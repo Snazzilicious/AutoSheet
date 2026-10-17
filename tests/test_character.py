@@ -221,31 +221,31 @@ def test_actions_and_saving(tmp_path):
     assert "amulet_of_health" not in reloaded.equipment
 
     # Cast spell & Long rest test
-    character.state["spell_slots"] = {"3": 2}
+    character.state["resources"] = {"spell slot: 3": 2}
     assert cast_spell(character, 3) is True
-    assert character.state["spell_slots"]["3"] == 1
+    assert character.state["resources"]["spell slot: 3"] == 1
 
     character.state["hp"]["current"] = 10
     character.state["conditions"] = ["poisoned"]
     equip_item(character, "amulet_of_health")
     long_rest(character)
     assert character.state["hp"]["current"] == 57  # Max HP
-    assert character.state["spell_slots"]["3"] == 2  # Restored
+    assert character.state["resources"]["spell slot: 3"] == 2  # Restored
     assert character.state["conditions"] == []
 
     # Short rest test for Warlock spell slots
     assert cast_spell(character, 3) is True
-    assert character.state["spell_slots"]["3"] == 1
+    assert character.state["resources"]["spell slot: 3"] == 1
     short_rest(character)
-    assert character.state["spell_slots"]["3"] == 2
+    assert character.state["resources"]["spell slot: 3"] == 2
 
     # Hit dice short rest vs long rest test
-    character.state["hit_dice"] = {"d8": 3}
+    character.state["resources"] = {"hit die: d8": 3, "spell slot: 3": 2}
     short_rest(character)
-    assert character.state["hit_dice"]["d8"] == 3  # Hit dice do not recharge on short rest
+    assert character.state["resources"]["hit die: d8"] == 3  # Hit dice do not recharge on short rest
 
     long_rest(character)
-    assert character.state["hit_dice"]["d8"] == 6  # Hit dice recharge on long rest
+    assert character.state["resources"]["hit die: d8"] == 6  # Hit dice recharge on long rest
 
 
 def test_save_character_with_effective(tmp_path):
