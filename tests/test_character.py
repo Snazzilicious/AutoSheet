@@ -10,6 +10,7 @@ from autosheet import (
     SavedCharacter,
     create_effective_character,
     EffectiveCharacter,
+    Resource,
     Rule,
     BASE,
     MODIFIERS,
@@ -168,7 +169,9 @@ def test_spell_slots_and_resources():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    assert effective.spell_slots_max == {"3": 2}
+    assert "3" in effective.resources
+    assert isinstance(effective.resources["3"], Resource)
+    assert effective.resources["3"].max_uses == 2
 
 
 def test_registries_and_features():

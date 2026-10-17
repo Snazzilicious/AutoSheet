@@ -5,6 +5,7 @@ from autosheet.core import (
     AbilityScores,
     AbilityModifiers,
     HitPoints,
+    Resource,
     Rule,
     MODIFIERS,
     DERIVED,
@@ -161,17 +162,20 @@ def update_spell_slots_and_resources(saved: SavedCharacter, effective: Effective
     """
     Calculate maximum spell slots and resource maximums.
     """
-    spell_slots_max = {}
-
     for class_data in saved.classes:
         class_name = class_data.get("name", "").lower()
         level = class_data.get("level", 1)
         if class_name == "warlock":
             slot_level = min(5, (level + 1) // 2)
             slot_count = 3 if level >= 11 else (4 if level >= 17 else 2)
-            spell_slots_max[str(slot_level)] = slot_count
-
-    effective.spell_slots_max = spell_slots_max
+            slot_key = str(slot_level)
+            state_slots = saved.state.get("spell_slots", {})
+            remaining = state_slots.get(slot_key, -1)
+            effective.resources[slot_key] = Resource(
+                name=f"Level {slot_level} Spell Slot",
+                max_uses=slot_count,
+                remaining_uses=remaining
+            )
 
 
 def update_conditions_and_effects(saved: SavedCharacter, effective: EffectiveCharacter) -> None:

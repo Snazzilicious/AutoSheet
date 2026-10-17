@@ -46,8 +46,11 @@ def long_rest(character: SavedCharacter) -> None:
     character.state.setdefault("hp", {})["current"] = max_hp
     character.state["hp"]["temporary"] = 0
 
-    max_slots = effective.spell_slots_max
-    character.state["spell_slots"] = dict(max_slots)
+    spell_slots = character.state.setdefault("spell_slots", {})
+    for k, v in effective.resources.items():
+        if k.isdigit():
+            v.recharge()
+            spell_slots[k] = v.max_uses
 
     character.state["conditions"] = []
     character.state["concentration"] = None
