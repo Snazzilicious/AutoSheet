@@ -35,7 +35,7 @@ class SavedCharacter:
         """
         Return rule objects representing things currently affecting the character.
         """
-        from autosheet.rules import CLASSES, FEATURES, ITEMS
+        from autosheet.rules import CLASSES, FEATURES, ITEMS, SPELLS
 
         sources = []
 
@@ -56,12 +56,19 @@ class SavedCharacter:
             else:
                 print(f"Unknown feature: {feature_id}")
 
-        # Equipped items
+        # Equipped items (agnostic to equipped status, only gathered if in equipment)
         for item_id in self.equipment:
             if item_id in ITEMS:
-                sources.append(ITEMS[item_id](equipped=True))
+                sources.append(ITEMS[item_id]())
             else:
                 print(f"Unknown item: {item_id}")
+
+        # Readied spells (agnostic to readied status, only gathered if in readied list)
+        for spell_id in self.spells.get("readied", []):
+            if spell_id in SPELLS:
+                sources.append(SPELLS[spell_id]())
+            else:
+                print(f"Unknown spell: {spell_id}")
 
         return sources
 
@@ -167,20 +174,14 @@ class CharacterAction:
     description: str = ""
 
 class Attack(CharacterAction):
-    
-    def __init__(self,name,range,atk_bonus,dmg_die,dmg_mod,dmg_type,cost="Action"):
-
-        description = f"Range {self.range}, +{self.bonus} to hit, {self.dmg}+{self.mod} {dmg_type} damage"
-
-        super().__init__( name, description, cost )
+    def __init__(self, name, range="5 ft", atk_bonus=0, dmg_die="1d8", dmg_mod=0, dmg_type="slashing", cost="Action"):
+        description = f"Range {range}, +{atk_bonus} to hit, {dmg_die}+{dmg_mod} {dmg_type} damage"
+        super().__init__(name, cost, description)
 
 class Spell(CharacterAction):
-    
-    def __init__(self,name,range,atk_bonus,dmg_die,dmg_mod,dmg_type,level,duration,concentration):
-
-        description = f"Range {self.range}, +{self.bonus} to hit, {self.dmg}+{self.mod} {dmg_type} damage"
-
-        super().__init__( name, description, "Action" )
+    def __init__(self, name, range="60 ft", atk_bonus=0, dmg_die="1d8", dmg_mod=0, dmg_type="force", level=1, duration="Instantaneous", concentration=False):
+        description = f"Range {range}, Level {level} spell, +{atk_bonus} to hit, {dmg_die}+{dmg_mod} {dmg_type} damage"
+        super().__init__(name, "Action", description)
 
 
 
@@ -266,9 +267,9 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
             "current": effective.hit_points.current,
             "temporary": effective.hit_points.temporary,
         },
-        "hit_dice": {
-            k: (v.max_uses if hasattr(v, "max_uses") else v)
-            for k, v in effective.hit_dice.items()
+        "resources": {
+            k: {"max_uses": v.max_uses, "remaining_uses": v.remaining_uses}
+            for k, v in effective.resources.items()
         },
         "abilities": {
             "strength": effective.abilities.strength,
@@ -288,10 +289,10 @@ def save_character_with_effective(character: SavedCharacter, effective: Effectiv
         },
         "saving_throws": effective.saving_throws,
         "skills": effective.skills,
-        "spell_slots_max": effective.spell_slots_max,
-        "features": sorted(list(effective.features)),
-        "conditions": effective.conditions,
-        "active_effects": effective.active_effects,
+        "features": sorted(list(effective.features.keys())),
+        "actions": {k: {"name": v.name, "cost": v.cost, "description": v.description} for k, v in effective.actions.items()},
+        "attacks": {k: {"name": v.name, "cost": v.cost, "description": v.description} for k, v in effective.attacks.items()},
+        "spells": {k: {"name": v.name, "cost": v.cost, "description": v.description} for k, v in effective.spells.items()},
     }
     if hasattr(path, "write"):
         yaml.safe_dump_all([saved_data, effective_data], path, sort_keys=False)

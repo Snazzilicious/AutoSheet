@@ -11,22 +11,17 @@ class Item(Rule):
     name = "Item"
     priority = BASE
 
-    def __init__(self, equipped: bool = False):
-        self.equipped = equipped
-        super().__init__(priority=self.priority, source=self.name, function=self.apply_effect_if_equipped)
-
-    def apply_effect_if_equipped(self, saved: SavedCharacter, effective: EffectiveCharacter) -> None:
-        if self.equipped:
-            self.apply_effect(saved, effective)
+    def __init__(self):
+        super().__init__(priority=self.priority, source=self.name, function=self.apply_effect)
 
     def apply_effect(self, saved: SavedCharacter, effective: EffectiveCharacter) -> None:
         pass
 
     def equip(self):
-        self.equipped = True
+        pass
 
     def unequip(self):
-        self.equipped = False
+        pass
 
 
 class AmuletOfHealth(Item):

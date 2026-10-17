@@ -39,15 +39,15 @@ class CharacterClass(Rule):
         state_hit_dice = saved.state.get("hit_dice", {})
         remaining = state_hit_dice.get(die_key, -1)
 
-        if die_key in effective.hit_dice:
-            existing = effective.hit_dice[die_key]
+        if die_key in effective.resources:
+            existing = effective.resources[die_key]
             existing.max_uses += self.level
             if remaining >= 0:
                 existing.remaining_uses = remaining
             else:
                 existing.remaining_uses = existing.max_uses
         else:
-            effective.hit_dice[die_key] = HitDie(die, self.level, remaining_uses=remaining)
+            effective.resources[die_key] = HitDie(die, self.level, remaining_uses=remaining)
 
 
 class Warlock(CharacterClass):

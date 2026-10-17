@@ -1,4 +1,4 @@
-from autosheet.core import Rule, SavedCharacter, EffectiveCharacter, FINAL, DERIVED
+from autosheet.core import Rule, SavedCharacter, EffectiveCharacter, Feature as CoreFeature, FINAL, DERIVED
 
 
 class Feature(Rule):
@@ -13,7 +13,8 @@ class Feature(Rule):
         super().__init__(priority=self.priority, source=self.name, function=self.add_to_character)
     
     def add_to_character(self, saved: SavedCharacter, effective: EffectiveCharacter) -> None:
-        effective.features.add(self.name)
+        desc = self.__doc__.strip() if self.__doc__ else ""
+        effective.features[self.name] = CoreFeature(name=self.name, description=desc)
 
 
 class AgonizingBlast(Feature):

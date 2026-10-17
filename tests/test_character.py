@@ -104,7 +104,7 @@ def test_active_sources():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    assert len(sources) == 8
+    assert len(sources) == 10
 
 
 def test_collect_updates_and_calculate():
@@ -112,8 +112,8 @@ def test_collect_updates_and_calculate():
     character = load_character(yaml_path)
 
     updates = collect_updates(character)
-    # Total updates: 8 standard + 1 class + 3 items + 4 features = 16 updates
-    assert len(updates) == 16
+    # Total updates: 8 standard + 1 class + 3 items + 4 features + 2 spells = 18 updates
+    assert len(updates) == 18
     assert updates[0].priority == BASE
 
     effective = calculate(character)
@@ -157,10 +157,10 @@ def test_hp_and_hit_dice():
     effective = calculate(character)
 
     assert effective.hit_points.max == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
-    assert "d8" in effective.hit_dice
-    assert isinstance(effective.hit_dice["d8"], HitDie)
-    assert effective.hit_dice["d8"].max_uses == 6
-    assert effective.hit_dice["d8"].remaining_uses == 6
+    assert "d8" in effective.resources
+    assert isinstance(effective.resources["d8"], HitDie)
+    assert effective.resources["d8"].max_uses == 6
+    assert effective.resources["d8"].remaining_uses == 6
 
 
 def test_spell_slots_and_resources():
@@ -176,8 +176,8 @@ def test_registries_and_features():
     character = load_character(yaml_path)
     sources = get_active_sources(character)
     
-    # 1 class (Warlock) + 4 features + 3 items = 8 sources
-    assert len(sources) == 8
+    # 1 class (Warlock) + 4 features + 3 items + 2 spells = 10 sources
+    assert len(sources) == 10
 
     effective = calculate(character)
     assert "Agonizing Blast" in effective.features
