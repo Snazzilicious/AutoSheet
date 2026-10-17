@@ -158,10 +158,10 @@ def test_hp_and_hit_dice():
     effective = calculate(character)
 
     assert effective.hit_points.max == 57  # Level 1: 8+4=12; Levels 2-6: 5*(5+4)=45; Total=57
-    assert "d8" in effective.resources
-    assert isinstance(effective.resources["d8"], HitDie)
-    assert effective.resources["d8"].max_uses == 6
-    assert effective.resources["d8"].remaining_uses == 6
+    assert "hit die: d8" in effective.resources
+    assert isinstance(effective.resources["hit die: d8"], HitDie)
+    assert effective.resources["hit die: d8"].max_uses == 6
+    assert effective.resources["hit die: d8"].remaining_uses == 6
 
 
 def test_spell_slots_and_resources():
@@ -169,9 +169,9 @@ def test_spell_slots_and_resources():
     character = load_character(yaml_path)
     effective = calculate(character)
 
-    assert "3" in effective.resources
-    assert isinstance(effective.resources["3"], Resource)
-    assert effective.resources["3"].max_uses == 2
+    assert "spell slot: 3" in effective.resources
+    assert isinstance(effective.resources["spell slot: 3"], Resource)
+    assert effective.resources["spell slot: 3"].max_uses == 2
 
 
 def test_registries_and_features():

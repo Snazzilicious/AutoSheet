@@ -36,10 +36,12 @@ def short_rest(character: SavedCharacter) -> None:
     """
     effective = calculate(character)
     spell_slots = character.state.setdefault("spell_slots", {})
+    from autosheet.rules.resources import SpellSlot
     for k, v in effective.resources.items():
-        if k.isdigit():
+        if isinstance(v, SpellSlot):
+            slot_key = str(v.level)
             v.recharge("Short Rest")
-            spell_slots[k] = v.remaining_uses
+            spell_slots[slot_key] = v.remaining_uses
 
 
 def long_rest(character: SavedCharacter) -> None:
@@ -52,10 +54,12 @@ def long_rest(character: SavedCharacter) -> None:
     character.state["hp"]["temporary"] = 0
 
     spell_slots = character.state.setdefault("spell_slots", {})
+    from autosheet.rules.resources import SpellSlot
     for k, v in effective.resources.items():
-        if k.isdigit():
+        if isinstance(v, SpellSlot):
+            slot_key = str(v.level)
             v.recharge()
-            spell_slots[k] = v.max_uses
+            spell_slots[slot_key] = v.max_uses
 
     character.state["conditions"] = []
     character.state["concentration"] = None

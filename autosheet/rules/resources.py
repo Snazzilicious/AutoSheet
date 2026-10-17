@@ -26,6 +26,7 @@ class SpellSlot(Resource):
     recharge_event = "Long Rest"
 
     def __init__(self, level: int, max_uses: int, remaining_uses: int = -1):
+        self.level = level
         self.name = f"Spell slot lvl {level:1d}"
         super().__init__(max_uses, remaining_uses)
 
