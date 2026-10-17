@@ -239,6 +239,14 @@ def test_actions_and_saving(tmp_path):
     short_rest(character)
     assert character.state["spell_slots"]["3"] == 2
 
+    # Hit dice short rest vs long rest test
+    character.state["hit_dice"] = {"d8": 3}
+    short_rest(character)
+    assert character.state["hit_dice"]["d8"] == 3  # Hit dice do not recharge on short rest
+
+    long_rest(character)
+    assert character.state["hit_dice"]["d8"] == 6  # Hit dice recharge on long rest
+
 
 def test_save_character_with_effective(tmp_path):
     yaml_path = Path(__file__).parent.parent / "characters" / "test_character.yaml"

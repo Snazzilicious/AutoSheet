@@ -1,4 +1,4 @@
-from autosheet.core import SavedCharacter
+from autosheet.core import SavedCharacter, EffectiveCharacter
 from autosheet.calculation import calculate
 
 
@@ -30,36 +30,39 @@ def cast_spell(character: SavedCharacter, spell_level: int) -> bool:
     return False
 
 
+def sync_resources_to_state(character: SavedCharacter, effective: EffectiveCharacter) -> None:
+    spell_slots = character.state.setdefault("spell_slots", {})
+    hit_dice = character.state.setdefault("hit_dice", {})
+    from autosheet.rules.resources import SpellSlot, HitDie
+    for v in effective.resources.values():
+        if isinstance(v, SpellSlot):
+            spell_slots[str(v.level)] = v.remaining_uses
+        elif isinstance(v, HitDie):
+            hit_dice[f"d{v.d}"] = v.remaining_uses
+
+
 def short_rest(character: SavedCharacter) -> None:
     """
     Perform a short rest.
     """
     effective = calculate(character)
-    spell_slots = character.state.setdefault("spell_slots", {})
-    from autosheet.rules.resources import SpellSlot
-    for k, v in effective.resources.items():
-        if isinstance(v, SpellSlot):
-            slot_key = str(v.level)
-            v.recharge("Short Rest")
-            spell_slots[slot_key] = v.remaining_uses
+    for v in effective.resources.values():
+        v.recharge("Short Rest")
+    sync_resources_to_state(character, effective)
 
 
 def long_rest(character: SavedCharacter) -> None:
     """
-    Perform a long rest, restoring HP to max, resetting spell slots, and clearing conditions.
+    Perform a long rest, restoring HP to max, resetting resources, and clearing conditions.
     """
     effective = calculate(character)
     max_hp = effective.hit_points.max
     character.state.setdefault("hp", {})["current"] = max_hp
     character.state["hp"]["temporary"] = 0
 
-    spell_slots = character.state.setdefault("spell_slots", {})
-    from autosheet.rules.resources import SpellSlot
-    for k, v in effective.resources.items():
-        if isinstance(v, SpellSlot):
-            slot_key = str(v.level)
-            v.recharge()
-            spell_slots[slot_key] = v.max_uses
+    for v in effective.resources.values():
+        v.recharge("Long Rest")
+    sync_resources_to_state(character, effective)
 
     character.state["conditions"] = []
     character.state["concentration"] = None

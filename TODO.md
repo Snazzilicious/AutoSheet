@@ -1,7 +1,5 @@
 0. Misc
-    2. Add type to resource display. 'd8' should be 'hit die: d8' or something etc
     3. add resources to SavedCharacter's state
-    4. update resource print outs to be remaining / max
     5. Don't add duplicate values e.g. class, race
         1. actually it would be nice if effective character was self sufficient
     6. add race to base
@@ -23,8 +21,6 @@
 2. Create all Rules
     1. Class
         1. move spell slots and resources and class-specific features to class
-3. Design and Add character actions
-4. Add descriptions
 
 ```Python
 # load saved character

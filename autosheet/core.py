@@ -142,16 +142,25 @@ class Resource:
     """
     Rechargable consumable required to use abilities.
     """
-    def __init__(self, name, max_uses: int, remaining_uses: int = -1, recharge_event = None):
+    recharge_events = set()
+
+    def __init__(self, name, max_uses: int, remaining_uses: int = -1, recharge_events: set[str] | None = None, recharge_event: str | None = None):
         self.name = name
         self.max_uses = max_uses
         self.remaining_uses = remaining_uses
         if self.remaining_uses < 0:
             self.remaining_uses = max_uses
-        self.recharge_event = recharge_event
+        if recharge_events is not None:
+            self.recharge_events = set(recharge_events)
+        elif recharge_event is not None:
+            self.recharge_events = {recharge_event}
+        elif hasattr(self, "recharge_events") and isinstance(self.recharge_events, set):
+            self.recharge_events = set(self.recharge_events)
+        else:
+            self.recharge_events = set()
 
     def recharge(self, recharge_event=None):
-        if recharge_event is None or recharge_event == self.recharge_event:
+        if recharge_event is None or recharge_event in self.recharge_events:
             self.remaining_uses = self.max_uses
     
     def use(self,n_uses=1):
