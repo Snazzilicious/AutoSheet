@@ -1,28 +1,27 @@
-
-
 0. Misc
-    5. add resources to SavedCharacter's state
-    6. Add attacks
-    7. add spells
-    8. add other actions
-    9. update resource print outs to be remaining / max
-    9. Don't add duplicate values e.g. class, race
+    1. Spells should not have atk printout if not attack
+        1. atk spells should maybe be under attacks ???
+    2. Add type to resource display. 'd8' should be 'hit die: d8' or something etc
+    3. add resources to SavedCharacter's state
+    4. update resource print outs to be remaining / max
+    5. Don't add duplicate values e.g. class, race
         1. actually it would be nice if effective character was self sufficient
-    10. add race to base
-    11. speed
-    12. Spell DC (per class)
-    14. handle case sensitivity
+    6. add race to base
+    7. speed
+    8. Spell DC (per class)
+    9. handle case sensitivity
         1. and maybe spaces too
-    3. add exp
-    17. alignment
-    18. languages
-    19. background
+    10. add exp
+    11. alignment
+    12. languages
+    13. background
 1. Fill out character sheet
     1. add all features
         1. how to pass metadata to features???
         2. including features from items
     2. Add spells
     3. add actions
+    4. Add attacks (weapons)
 2. Create all Rules
     1. Class
         1. move spell slots and resources and class-specific features to class
@@ -37,17 +36,4 @@ while true:
     # do an action
     # save base character
     # display effective character
-```
-
-
-### Additional rules infrastructure
-
-```Python
-class CharacterAction(Rule):
-    """
-    An entry in the EffectiveCharacter's action list
-    Has a short name for display
-    Provides a description of the action
-    Includes 'cost'
-    """
 ```

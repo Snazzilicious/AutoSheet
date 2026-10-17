@@ -95,8 +95,13 @@ hit_points:
   max: 74
   current: 37
   temporary: 0
-hit_dice:
-  d8: 7
+resources:
+  d8:
+    max_uses: 7
+    remaining_uses: 6
+  '4':
+    max_uses: 2
+    remaining_uses: 2
 abilities:
   strength: 8
   dexterity: 17
@@ -137,12 +142,19 @@ skills:
   intimidation: 4
   performance: 4
   persuasion: 4
-spell_slots_max:
-  '4': 2
 features:
 - Agonizing Blast
 - Devil's Sight
 - Eldritch Mind
 - Repelling Blast
-conditions: []
-active_effects: []
+actions: {}
+attacks: {}
+spells:
+  Hex:
+    name: Hex
+    cost: Action
+    description: Range 60 ft, Level 1 spell, +0 to hit, 1d8+0 force damage
+  Bless:
+    name: Bless
+    cost: Action
+    description: Range 60 ft, Level 1 spell, +0 to hit, 1d8+0 force damage
